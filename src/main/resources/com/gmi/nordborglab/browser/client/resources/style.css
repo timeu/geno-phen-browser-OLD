@@ -1,0 +1,40 @@
+@CHARSET "UTF-8";
+
+@sprite .transplant_logo_footer {
+    gwt-image: 'transplant_logo_footer';
+}
+
+@sprite .gmi_logo_footer {
+    gwt-image: 'gmi_logo_footer';
+}
+
+@sprite .fp7_logo_footer {
+    gwt-image: 'fp7_logo_footer';
+}
+
+@sprite .eu_logo_footer {
+    gwt-image: 'eu_logo_footer';
+}
+
+@sprite .arrow_down {
+	gwt-image: 'arrow_down';
+	position: absolute;
+	top: 1.72em;
+	right: 3px;
+	margin-right: 4px;
+}
+
+@sprite .avatar {
+	gwt-image:'avatar';
+	float:left;
+}
+
+@sprite .logout {
+	gwt-image:'logout';
+	float:left;
+}
+
+@sprite .profile {
+	gwt-image:'profile';
+	float:left;
+}
