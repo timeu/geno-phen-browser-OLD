@@ -7,11 +7,14 @@ import static org.junit.Assert.assertNull;
 import javax.annotation.Resource;
 
 import org.junit.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.gmi.nordborglab.browser.server.domain.germplasm.Stock;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.observation.Locality;
 import com.gmi.nordborglab.browser.server.domain.observation.ObsUnit;
+import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 
 
@@ -51,6 +54,21 @@ public class ObsUnitRepositoryTest extends BaseTest{
 		ObsUnit actual = repository.save(created);
 		assertObsUnit(actual);
 	}
+	
+	@Test
+	public void testfindObsUnitByPhenotypeId() {
+		PageRequest pageRequest = new PageRequest(0, 50);
+		Page<ObsUnit> page = repository.findByPhenotypeId(1L, pageRequest);
+		assertNotNull(page);
+		assertEquals(0,page.getNumber());
+		assertNotNull(page.getContent());
+		assertEquals(page.getSize(), page.getContent().size());
+		assertEquals(167,page.getTotalElements());
+		ObsUnit trait = page.getContent().get(0);
+		assertEquals(trait.getExperiment().getId(), new Long(1L));
+	}
+	
+	
 	
 	
 	public static ObsUnit createObsUnitWithAllDependencies() {

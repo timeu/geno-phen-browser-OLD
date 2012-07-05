@@ -7,12 +7,16 @@
 	<inherits name="com.google.gwt.inject.Inject" />
 	<inherits name='com.gwtplatform.mvp.Mvp' />
 	<inherits name="com.google.gwt.resources.Resources" />
+	<inherits name='com.gwtplatform.dispatch.Dispatch' />
 	<inherits name='com.google.gwt.user.theme.clean.Clean'/>
 	<inherits name="com.google.web.bindery.autobean.AutoBean" />
 	<inherits name="com.google.gwt.editor.Editor" />
 	<inherits name='com.google.web.bindery.requestfactory.RequestFactory' />
+	<inherits name="at.gmi.nordborglab.widgets.gwasgeneviewer.GWASGeneViewer" />
 	<inherits name="com.google.gwt.logging.Logging"/>
-	<inherits name="com.google.common.collect.Collect"/>
+	<inherits name='com.google.gwt.visualization.Visualization'/>
+	<inherits name="com.google.common.collect.Collect"/> 
+	<inherits name="com.google.gwt.precompress.Precompress"/>
 	
 	<!-- Other module inherits                                      -->
 
@@ -29,5 +33,7 @@
 		value="com.gmi.nordborglab.browser.client.gin.ClientGinjector" />
 
 	<entry-point class="com.gmi.nordborglab.browser.client.entrypoints.Browser" />
+	
+	<set-property name='ClientBundle.enableInlining' value='false' />
 	
 </module>

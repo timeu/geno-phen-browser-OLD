@@ -1,6 +1,7 @@
 package com.gmi.nordborglab.browser.client.manager;
 
 import com.gmi.nordborglab.browser.shared.proxy.PhenotypePageProxy;
+import com.gmi.nordborglab.browser.shared.proxy.PhenotypeProxy;
 import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
 import com.gmi.nordborglab.browser.shared.service.PhenotypeRequest;
 import com.google.inject.Inject;
@@ -20,6 +21,11 @@ public class PhenotypeManager extends RequestFactoryManager<PhenotypeRequest> {
 	@Override
 	public PhenotypeRequest getContext() {
 		return rf.phenotypeRequest();
+	}
+
+	public void findOne(Receiver<PhenotypeProxy> receiver, Long id) {
+		rf.phenotypeRequest().findPhenotype(id).with("unitOfMeasure","userPermission").fire(receiver);
+		
 	}
 
 }

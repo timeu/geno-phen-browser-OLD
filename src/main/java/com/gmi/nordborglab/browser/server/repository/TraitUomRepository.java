@@ -20,4 +20,15 @@ public interface TraitUomRepository extends JpaRepository<TraitUom, Long> {
 	
 	@Query("SELECT DISTINCT t FROM TraitUom t JOIN t.traits as trait JOIN trait.obsUnit as o JOIN o.experiment as e WHERE e.id = :experimentId order by t.id")
 	public List<TraitUom> findByExperimentId(@Param("experimentId") Long experimentId);
+	
+	@Query("SELECT DISTINCT t FROM TraitUom t JOIN t.traits as trait JOIN trait.studies as s WHERE s.id = :studyId")
+	public TraitUom findByStudyId(@Param("studyId") Long studyId);
+	
+	@Query("SELECT COUNT(DISTINCT o) FROM ObsUnit o JOIN o.traits as t JOIN t.traitUom as uom WHERE uom.id = :phenotypeId")
+	Long countObsUnitsByPhenotypeId(@Param("phenotypeId") Long phenotypeId);
+	
+	@Query("SELECT COUNT(DISTINCT s) FROM Study s JOIN s.traits as t JOIN t.traitUom as uom WHERE uom.id = :phenotypeId")
+	Long countStudiesByPhenotypeId(@Param("phenotypeId") Long phenotypeId);
+	
+	
 }

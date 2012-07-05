@@ -4,6 +4,8 @@ import java.util.Iterator;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.layout.client.Layout.AnimationCallback;
+import com.google.gwt.layout.client.Layout.Layer;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -50,7 +52,7 @@ public class VerticalNavSplitLayoutPanel extends Composite implements HasWidgets
 	
 	
 	private void setLayout() {
-		DockLayoutPanel layoutPanel = (DockLayoutPanel)getParent();
+		final DockLayoutPanel layoutPanel = (DockLayoutPanel)getParent();
 		if (isHidden) {
 			layoutPanel.setWidgetSize(this.asWidget(), size);
 			splitter.removeStyleName(style.splitter_min());
@@ -60,6 +62,18 @@ public class VerticalNavSplitLayoutPanel extends Composite implements HasWidgets
 			splitter.addStyleName(style.splitter_min());
 		}
 		isHidden = !isHidden;
+		/*workaround for bug http://code.google.com/p/google-web-toolkit/issues/detail?id=7188*/
+		layoutPanel.animate(0,new AnimationCallback() {
+			
+			@Override
+			public void onLayout(Layer layer, double progress) {
+			}
+			
+			@Override
+			public void onAnimationComplete() {
+				layoutPanel.forceLayout();
+			}
+		});;
 	}
 	
 	@Override

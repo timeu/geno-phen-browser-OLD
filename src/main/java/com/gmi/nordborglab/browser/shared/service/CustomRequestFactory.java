@@ -7,5 +7,6 @@ public interface CustomRequestFactory extends RequestFactory{
 	ExperimentRequest experimentRequest();
 	PhenotypeRequest  phenotypeRequest();
 	HelperRequest helperRequest();
-
+	ObsUnitRequest obsUnitRequest();
+	CdvRequest cdvRequest();
 }

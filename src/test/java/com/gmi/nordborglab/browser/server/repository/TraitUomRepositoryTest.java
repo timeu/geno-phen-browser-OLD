@@ -57,6 +57,25 @@ public class TraitUomRepositoryTest extends BaseTest {
 		assertEquals(107, traits.size());
 	}
 	
+	@Test
+	public void testCountObsUnitsByPhenotypeId() {
+		Long count = repository.countObsUnitsByPhenotypeId(1L);
+		assertEquals(new Long(167L), count);
+	}
+	
+	@Test
+	public void testCountStudiesByPhenotypeId() {
+		Long count = repository.countStudiesByPhenotypeId(1L);
+		assertEquals(new Long(1), count);
+	}
+	
+	@Test
+	public void testFindByStudyId() {
+		TraitUom trait = repository.findByStudyId(1L);
+		assertNotNull("trait not found",trait);
+		assertEquals("id of trait is wrong",1L, trait.getId().longValue());
+	}
+	
 	public static TraitUom createTraitUomWithAllDependencies() {
 		TraitUom created = new TraitUom();
 		created.setLocalTraitName("test");
@@ -73,5 +92,7 @@ public class TraitUomRepositoryTest extends BaseTest {
 		assertNotNull("Experiment is not set", actual.getUnitOfMeasure());
 		assertEquals("unit type for UnitOfMeasure incorrect", "test",actual.getUnitOfMeasure().getUnitType());
 	}
+	
+	
 	
 }

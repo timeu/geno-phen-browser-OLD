@@ -25,6 +25,8 @@ import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.gmi.nordborglab.browser.server.domain.acl.AppUser;
 import com.gmi.nordborglab.browser.server.domain.acl.Authority;
@@ -170,18 +172,22 @@ public class ExperimentServiceTest extends BaseTest {
 		
 	}
 	
+
 	private void createTestUser(String role) {
 		AppUser appUser = new AppUser("test@test.at");
 		appUser.setOpenidUser(false);
 		Md5PasswordEncoder encoder = new Md5PasswordEncoder();
 		appUser.setPassword(encoder.encodePassword(SecurityUtils.TEST_PASSWORD, null));
 		List<Authority> authorities = new ArrayList<Authority>();
+		List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+		SimpleGrantedAuthority auth = new SimpleGrantedAuthority(role); 
+		grantedAuthorities.add(auth);
 		Authority authority = new Authority();
 		authority.setAuthority(role);
 		authorities.add(authority);
 		appUser.setAuthorities(authorities);
 		userRepository.save(appUser);
-		SecurityUtils.makeActiveUser(SecurityUtils.TEST_USERNAME, SecurityUtils.TEST_PASSWORD);
+		SecurityUtils.makeActiveUser(SecurityUtils.TEST_USERNAME, SecurityUtils.TEST_PASSWORD,grantedAuthorities);
 	}
 	
 	

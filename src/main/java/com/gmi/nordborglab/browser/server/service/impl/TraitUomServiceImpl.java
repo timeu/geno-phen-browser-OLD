@@ -5,7 +5,10 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.ObjectIdentity;
@@ -14,10 +17,12 @@ import org.springframework.security.acls.model.Sid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.pages.TraitUomPage;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.repository.ExperimentRepository;
 import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
+import com.gmi.nordborglab.browser.server.security.CustomAccessControlEntry;
 import com.gmi.nordborglab.browser.server.security.SecurityUtil;
 import com.gmi.nordborglab.browser.server.service.TraitUomService;
 import com.google.common.base.Predicate;
@@ -38,6 +43,9 @@ public class TraitUomServiceImpl implements TraitUomService {
 
 	@Resource
 	private MutableAclService aclService;
+	
+	@Resource
+	private RoleHierarchy roleHierarchy;
 
 	@Override
 	public TraitUomPage findPhenotypesByExperiment(Long id, int start, int size) {
@@ -45,8 +53,11 @@ public class TraitUomServiceImpl implements TraitUomService {
 		PageRequest pageRequest = new PageRequest(start, size);
 		FluentIterable<TraitUom> traits = findPhenotypesByExperimentid(id);
 		int	totalElements = traits.size();
+		int pageStart = 0;
+		if (start > 0)
+			pageStart = start/size;
 		if (totalElements > 0) {
-			page = new TraitUomPage(Iterables.get(Iterables.partition(traits, size), start), pageRequest,
+			page = new TraitUomPage(Iterables.get(Iterables.partition(traits, size), pageStart), pageRequest,
 					totalElements);
 		}
 		else {
@@ -56,7 +67,7 @@ public class TraitUomServiceImpl implements TraitUomService {
 	}
 	
 	private FluentIterable<TraitUom> findPhenotypesByExperimentid(Long id) {
-		final List<Sid> authorities = SecurityUtil.getSids();
+		final List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
 		final ImmutableList<Permission> permissions = ImmutableList.of(BasePermission.READ);
 		FluentIterable<TraitUom> traits = FluentIterable.from(traitUomRepository.findByExperimentId(id));
 		if (traits.size() > 0) {
@@ -87,6 +98,34 @@ public class TraitUomServiceImpl implements TraitUomService {
 	public int countPhenotypeByExperimentCount(Long id) {
 		FluentIterable<TraitUom> traits = findPhenotypesByExperimentid(id);
 		return traits.size();
+	}
+
+	@Override
+	public TraitUom findPhenotype(Long id) {
+		TraitUom traitUom = traitUomRepository.findOne(id);
+		List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
+		ObjectIdentity oid = new ObjectIdentityImpl(TraitUom.class,
+				traitUom.getId());
+		Acl acl = aclService.readAclById(oid, authorities);
+		boolean isOwner = false;
+		for (Sid sid : authorities) {
+			if (sid.equals(acl.getOwner())) {
+				isOwner = true;
+				break;
+			}
+		}
+		AccessControlEntry ace = null;
+		if (acl.getEntries().size() > 0)
+			 ace = acl.getEntries().get(0);
+		else if (acl.getParentAcl().getEntries().size() > 0)
+			ace = acl.getParentAcl().getEntries().get(0);
+			
+		traitUom.setIsOwner(isOwner);
+		if (ace != null)
+			traitUom.setUserPermission(new CustomAccessControlEntry(ace.getPermission().getMask(),ace.isGranting()));
+		traitUom.setNumberOfObsUnits(traitUomRepository.countObsUnitsByPhenotypeId(id));
+		traitUom.setNumberOfStudies(traitUomRepository.countStudiesByPhenotypeId(id));
+		return traitUom;
 	}
 }
 

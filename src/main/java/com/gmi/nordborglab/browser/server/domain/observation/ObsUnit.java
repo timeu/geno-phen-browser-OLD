@@ -52,6 +52,7 @@ public class ObsUnit extends BaseEntity {
 	private Date planting_date;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date harvest_date;
+	private String comments;
 	
 	public ObsUnit() {}
 	
@@ -137,6 +138,16 @@ public class ObsUnit extends BaseEntity {
 	
 	public Set<Trait> getTraits() {
 		return traits;
+	}
+
+
+	public String getComments() {
+		return comments;
+	}
+
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 	
 }

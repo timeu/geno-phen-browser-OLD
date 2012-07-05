@@ -7,6 +7,10 @@ public class NameTokens {
 	public static final String experiment = "experiment/{id}/overview";
 	public static final String phenotypes = "experiment/{id}/phenotypes";
 	public static final String phenotype = "phenotype/{id}/overview";
+	public static final String obsunit = "phenotype/{id}/obsunits";
+	public static final String studylist = "phenotype/{id}/studylist";
+	public static final String study = "study/{id}/overview";
+	public static final String studygwas = "study/{id}/studygwas";
 
 	public static String getHome() {
 		return home;
@@ -26,6 +30,22 @@ public class NameTokens {
 
 	public static String getPhenotype() {
 		return phenotype;
+	}
+
+	public static String getObsunit() {
+		return obsunit;
+	}
+
+	public static String getStudylist() {
+		return studylist;
+	}
+
+	public static String getStudy() {
+		return study;
+	}
+
+	public static String getStudygwas() {
+		return studygwas;
 	}
 	
 	

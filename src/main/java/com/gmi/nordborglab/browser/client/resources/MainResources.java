@@ -16,6 +16,10 @@ public interface MainResources extends ClientBundle{
 		String avatar();
 		String logout();
 		String profile();
+		String button();
+		String button_grey();
+		String button_blue();
+		String cursor();
 	}
 
 	@Source("images/transplant_logo_small.png")

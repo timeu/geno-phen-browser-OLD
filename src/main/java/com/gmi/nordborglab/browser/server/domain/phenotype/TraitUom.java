@@ -12,9 +12,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.gmi.nordborglab.browser.server.domain.BaseEntity;
 import com.gmi.nordborglab.browser.server.domain.acl.AclTraitUomIdentity;
+import com.gmi.nordborglab.browser.server.security.CustomAccessControlEntry;
 
 @Entity
 @Table(name="div_trait_uom",schema="phenotype")
@@ -36,6 +38,17 @@ public class TraitUom extends BaseEntity {
 	private String trait_protocol;
 	private String to_accession;
 	private String eo_accession;
+	
+	@Transient
+	private Long numberOfObsUnits;
+	
+	@Transient
+	private Long numberOfStudies;
+	
+	@Transient
+	private CustomAccessControlEntry userPermission = null;
+	@Transient 
+	boolean isOwner = false;
 	
 	public TraitUom() { }
 	
@@ -76,6 +89,37 @@ public class TraitUom extends BaseEntity {
 	}
 	public void setEoAccession(String eoAccession) {
 		this.eo_accession = eoAccession;
+	}
+
+	public CustomAccessControlEntry getUserPermission() {
+		return userPermission;
+	}
+	
+	public void setUserPermission(CustomAccessControlEntry userPermission)  {
+		this.userPermission = userPermission;
+	}
+	
+	public void setIsOwner(boolean isOwner) {
+		this.isOwner = isOwner;
+	}
+	public boolean isOwner() {
+		return isOwner;
+	}
+
+	public Long getNumberOfObsUnits() {
+		return numberOfObsUnits;
+	}
+
+	public void setNumberOfObsUnits(Long count) {
+		this.numberOfObsUnits = count;
+	}
+
+	public Long getNumberOfStudies() {
+		return numberOfStudies;
+	}
+
+	public void setNumberOfStudies(Long numberOfStudies) {
+		this.numberOfStudies = numberOfStudies;
 	}
 
 	

@@ -88,10 +88,9 @@ public class ExperimentServiceImpl extends WebApplicationObjectSupport
 	}
 
 	@Override
-	@Transactional
 	public Experiment findExperiment(Long id) {
 		Experiment experiment = experimentRepository.findOne(id);
-		List<Sid> authorities = SecurityUtil.getSids();
+		List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
 		ObjectIdentity oid = new ObjectIdentityImpl(Experiment.class,
 				experiment.getId());
 		Acl acl = aclService.readAclById(oid, authorities);

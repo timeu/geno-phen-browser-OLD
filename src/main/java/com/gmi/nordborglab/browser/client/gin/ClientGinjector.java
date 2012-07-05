@@ -1,28 +1,32 @@
 package com.gmi.nordborglab.browser.client.gin;
 
-import com.gmi.nordborglab.browser.client.mvp.home.HomePresenter;
-import com.gmi.nordborglab.browser.client.mvp.home.dashboard.DashboardPresenter;
-import com.gmi.nordborglab.browser.client.mvp.main.MainPagePresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.DiversityPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentsOverviewPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentsOverviewTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.PhenotypeListPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.ObsUnitPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.PhenotypeDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.PhenotypeDetailTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.StudyListPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyGWASPlotPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.home.HomePresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.home.dashboard.DashboardPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.main.MainPagePresenter;
 import com.gmi.nordborglab.browser.client.resources.MainResources;
 import com.gmi.nordborglab.browser.client.ui.SimpleTabPanel;
+import com.google.gwt.inject.client.AsyncProvider;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.google.gwt.inject.client.AsyncProvider;
-import com.google.gwt.user.client.ui.SimpleLayoutPanel;
-import com.gmi.nordborglab.browser.client.mvp.diversity.DiversityPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.ExperimentsOverviewPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.ExperimentDetailPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.ExperimentsOverviewTabPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.ExperimentDetailTabPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.PhenotypeListPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.PhenotypeDetailTabPresenter;
-import com.gmi.nordborglab.browser.client.mvp.diversity.experiments.PhenotypeDetailPresenter;
 
 
-@GinModules({ClientModule.class})
+@GinModules({ClientDispatchModule.class,ClientModule.class})
 public interface ClientGinjector extends Ginjector{
 	EventBus getEventBus();
 	MainResources getMainResources();
@@ -39,4 +43,9 @@ public interface ClientGinjector extends Ginjector{
 	AsyncProvider<PhenotypeListPresenter> getPhenotypeListPresenter();
 	AsyncProvider<PhenotypeDetailTabPresenter> getPhenotypeDetailTabPresenter();
 	AsyncProvider<PhenotypeDetailPresenter> getPhenotypeDetailPresenter();
+	AsyncProvider<ObsUnitPresenter> getObsUnitPresenter();
+	AsyncProvider<StudyListPresenter> getStudyListPresenter();
+	AsyncProvider<StudyTabPresenter> getStudyTabPresenter();
+	AsyncProvider<StudyDetailPresenter> getStudyDetailPresenter();
+	AsyncProvider<StudyGWASPlotPresenter> getStudyGWASPlotPresenter();
 }

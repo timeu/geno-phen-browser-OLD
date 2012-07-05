@@ -9,12 +9,23 @@ import com.google.web.bindery.requestfactory.shared.ProxyFor;
 public interface PhenotypeProxy extends EntityProxy{
 
 	Long getId();
+	
+	UnitOfMeasureProxy getUnitOfMeasure();
 
 	String getLocalTraitName();
 
 	String getTraitProtocol();
 
-	//String getTraitOntology();
+	String getToAccession();
 	
+	String getEoAccession();
+
+	boolean isOwner();
+	
+	AccessControlEntryProxy getUserPermission();
+
+	Long getNumberOfObsUnits();
+
+	Long getNumberOfStudies();
 	
 }

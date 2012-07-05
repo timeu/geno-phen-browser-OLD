@@ -2,6 +2,9 @@ package com.gmi.nordborglab.browser.client;
 
 
 import com.gmi.nordborglab.browser.client.gin.DefaultPlace;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.MotionChart;
+import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.proxy.PlaceManagerImpl;
@@ -21,7 +24,16 @@ public class ClientPlaceManager extends PlaceManagerImpl {
 	public void revealDefaultPlace() {
 		revealPlace(defaultPlaceRequest);
 	}
-	
-	
 
+	@Override
+	public void revealCurrentPlace() {
+		VisualizationUtils.loadVisualizationApi(new Runnable() {
+			
+			@Override
+			public void run() {
+				ClientPlaceManager.super.revealCurrentPlace();
+				
+			}
+		}, CoreChart.PACKAGE, MotionChart.PACKAGE);	
+	}
 }

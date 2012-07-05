@@ -110,11 +110,13 @@ public class SecurityUtil {
 		return ImmutableBiMap.copyOf(identities);
 	}
 
-	public static List<Sid> getSids() {
+	public static List<Sid> getSids(RoleHierarchy roleHierarchy) {
 		List<Sid> sids = new ArrayList<Sid>();
 		Authentication user = getAuthentication();
 		sids.add(new PrincipalSid(user));
-		Collection<GrantedAuthority> grantedAuthorities = (Collection<GrantedAuthority>) user.getAuthorities();
+		Collection<? extends GrantedAuthority> grantedAuthorities = user.getAuthorities();
+		if (roleHierarchy != null)
+			grantedAuthorities = roleHierarchy.getReachableGrantedAuthorities(grantedAuthorities); 
 		for (GrantedAuthority auth: grantedAuthorities) {
 			sids.add(new GrantedAuthoritySid(auth));
 		}
