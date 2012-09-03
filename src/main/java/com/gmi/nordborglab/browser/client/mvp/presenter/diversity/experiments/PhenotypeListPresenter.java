@@ -133,7 +133,7 @@ public class PhenotypeListPresenter
 				return;
 			}
 			if (experiment == null || !experiment.getId().equals(experimentIdToLoad)) {
-				phenotypeManager.requestFactory().experimentRequest().findExperiment(experimentIdToLoad).fire(new Receiver<ExperimentProxy>() {
+				phenotypeManager.requestFactory().experimentRequest().findExperiment(experimentIdToLoad).with("userPermission").fire(new Receiver<ExperimentProxy>() {
 	
 					@Override
 					public void onSuccess(ExperimentProxy response) {

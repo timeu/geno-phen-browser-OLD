@@ -15,8 +15,9 @@
      <script type="text/javascript">
         //google.load("visualization", "1", {'packages' : ["corechart","motionchart","geomap"] });
     <sec:authorize access="isAuthenticated()">
-       	var data={'user':'<sec:authentication htmlEscape="false" property="principal.json"/>'};
+       	var userData={'user':'<sec:authentication htmlEscape="false" property="principal.json"/>'};
    	</sec:authorize>
+   	    var appData={'data':'${appData}'}
     </script>
     <script type="text/javascript" src="<c:url value='/browser/browser.nocache.js'/>"></script>
   </head>

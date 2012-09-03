@@ -99,8 +99,9 @@ public class ExperimentDetailPresenter
 		this.editDriver = getView().getExperimentEditDriver();
 		receiver = new Receiver<ExperimentProxy>() {
 			public void onSuccess(ExperimentProxy response) {
-				getView().getExperimentDisplayDriver().display(response);
+				experiment = response;
 				getView().setState(State.DISPLAYING,getPermission());
+				getView().getExperimentDisplayDriver().display(experiment);
 			}
 
 			public void onFailure(ServerFailure error) {
@@ -183,7 +184,7 @@ public class ExperimentDetailPresenter
 		ExperimentRequest ctx = experimentManager.getRequestFactory()
 				.experimentRequest();
 		editDriver.edit(experiment, ctx);
-		ctx.save(experiment).to(receiver);
+		ctx.save(experiment).with("userPermission").to(receiver);
 	}
 
 	@Override

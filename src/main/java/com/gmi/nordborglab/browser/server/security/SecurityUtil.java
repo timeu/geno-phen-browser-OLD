@@ -25,6 +25,7 @@ import com.gmi.nordborglab.browser.shared.proxy.AppUserProxy;
 import com.gmi.nordborglab.browser.shared.proxy.AuthorityProxy;
 import com.gmi.nordborglab.browser.shared.service.AppUserFactory;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 import com.google.web.bindery.autobean.vm.AutoBeanFactorySource;
@@ -35,6 +36,8 @@ public class SecurityUtil {
 	private static AppUserFactory appUserFactory = AutoBeanFactorySource.create(AppUserFactory.class);
 	
 	public static final String DEFAULT_AUTHORITY = "ROLE_USER";
+	
+	public static ImmutableSet<String> ALLOWED_AUTHORITIES = ImmutableSet.of("ROLE_ADMIN", "ROLE_USER","ROLE_ANONYMOUS");
 
 	public static Collection<? extends GrantedAuthority> getGrantedAuthorities(List<Authority> authorities) {
 		Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();

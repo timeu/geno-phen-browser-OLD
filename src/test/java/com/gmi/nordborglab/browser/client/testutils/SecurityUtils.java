@@ -7,8 +7,10 @@ import com.gmi.nordborglab.browser.client.testutils.proxys.AppUserProxyHelper;
 import com.gmi.nordborglab.browser.client.testutils.proxys.AuthorityProxyHelper;
 import com.gmi.nordborglab.browser.shared.proxy.AppUserProxy;
 import com.gmi.nordborglab.browser.shared.proxy.AuthorityProxy;
+import com.google.common.collect.ImmutableList;
 
 public class SecurityUtils {
+	
 
 	public static AppUserProxy createAdminUser() {
 		AppUserProxy userProxy = AppUserProxyHelper.createProxy();

@@ -33,7 +33,7 @@ public class MainPagePresenter extends
 		void setActiveNavigationItem(MENU menu);
 		void showNotification(String caption, String message, int level,
 				int duration);
-		void showLoadingIndicator(boolean show);
+		void showLoadingIndicator(boolean show, String text);
 	}
 	
 	@ContentSlot
@@ -71,17 +71,6 @@ public class MainPagePresenter extends
 	@Override
 	protected void onBind() {
 		super.onBind();
-		String userData = getView().getUserData();
-		if (userData != null) {
-			try {
-				AutoBean<AppUserProxy> userBean = AutoBeanCodex.decode(appUserFactory, AppUserProxy.class, userData);
-				currentUser.setAppUser(userBean.as());
-			}
-			catch (Exception e ) {
-				Logger logger = Logger.getLogger("");
-				logger.log(Level.SEVERE, "Autobean decoding", e);
-			}
-		}
 		registerHandler(getEventBus().addHandler(DisplayNotificationEvent.getType(), new DisplayNotificationEvent.DisplayNotificationHandler() {
 			
 			@Override
@@ -94,7 +83,7 @@ public class MainPagePresenter extends
 			
 			@Override
 			public void onProcessLoadingIndicator(LoadingIndicatorEvent event) {
-				getView().showLoadingIndicator(event.getShow());
+				getView().showLoadingIndicator(event.getShow(),event.getText());
 			}
 		}));
 		//setInSlot(TYPE_SetUserInfoContent, userInfoPresenter);

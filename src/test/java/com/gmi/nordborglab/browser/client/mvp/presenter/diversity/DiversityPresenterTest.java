@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -77,6 +78,7 @@ public class DiversityPresenterTest extends PresenterTestBase {
 		when(service.getBreadcrumbs(1L,"phenotype")).thenReturn(breadcrumbs);
 	}
 	
+	@Ignore
 	@Test
 	public void testBreadcrumbs() {
 		PlaceRequest request = new PlaceRequest("phenotype").with("id","1");

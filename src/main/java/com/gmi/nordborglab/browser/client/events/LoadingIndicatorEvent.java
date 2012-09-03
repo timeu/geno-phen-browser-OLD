@@ -9,6 +9,7 @@ public class LoadingIndicatorEvent  extends GwtEvent<LoadingIndicatorHandler> {
 	
 	private static final Type<LoadingIndicatorHandler> TYPE = new Type<LoadingIndicatorHandler>();
 	protected boolean show;
+	protected String text = "Loading...";
 	
 	public interface LoadingIndicatorHandler extends EventHandler {
 		  void onProcessLoadingIndicator(LoadingIndicatorEvent event);
@@ -21,9 +22,19 @@ public class LoadingIndicatorEvent  extends GwtEvent<LoadingIndicatorHandler> {
 	 public static void fire(HasHandlers source,boolean show) {
 		 source.fireEvent(new LoadingIndicatorEvent(show));
 	 }
+	 
+	 public static void fire(HasHandlers source, boolean show,String text) {
+		 source.fireEvent(new LoadingIndicatorEvent(show,text));
+	 }
 		  
 	 public LoadingIndicatorEvent(boolean show) {
+		 this(show,null);
+	 }
+	 
+	 public LoadingIndicatorEvent(boolean show,String text) {
 		 this.show = show;
+		 if (text != null && !text.equals(""))
+			 this.text = text; 
 	 }
 
 	  @Override
@@ -39,6 +50,10 @@ public class LoadingIndicatorEvent  extends GwtEvent<LoadingIndicatorHandler> {
 	  public boolean getShow()
 	  {
 		  return this.show;
+	  }
+	  
+	  public String getText() {
+		  return text;
 	  }
 }
 

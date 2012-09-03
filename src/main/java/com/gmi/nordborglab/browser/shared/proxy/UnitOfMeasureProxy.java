@@ -8,5 +8,9 @@ import com.google.web.bindery.requestfactory.shared.ProxyFor;
 @ProxyFor(value=UnitOfMeasure.class, locator=SpringEntitiyLocator.class)
 public interface UnitOfMeasureProxy extends EntityProxy {
 
+	Long getId();
+	void setId(Long id);
 	String getUnitType();
+	void setUnitType(String unitType);
+	
 }

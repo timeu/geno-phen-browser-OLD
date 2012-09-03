@@ -2,25 +2,29 @@ package com.gmi.nordborglab.browser.client.mvp.view.diversity.phenotype;
 
 import com.gmi.nordborglab.browser.client.NameTokens;
 import com.gmi.nordborglab.browser.client.ParameterizedPlaceRequest;
+import com.gmi.nordborglab.browser.client.mvp.handlers.StudyListUiHandlers;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.StudyListPresenter;
 import com.gmi.nordborglab.browser.shared.proxy.StudyProxy;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
-import com.gwtplatform.mvp.client.annotations.NameToken;
+import com.gwtplatform.mvp.client.ViewWithUiHandlers;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
-public class StudyListView extends ViewImpl implements
+public class StudyListView extends ViewWithUiHandlers<StudyListUiHandlers> implements
 		StudyListPresenter.MyView {
 
 	private final Widget widget;
@@ -40,6 +44,8 @@ public class StudyListView extends ViewImpl implements
 	
 	@UiField(provided=true) DataGrid<StudyProxy> dataGrid;
 	@UiField(provided=true) SimplePager pager;
+	@UiField Button newStudyBtn;
+	
 	protected final PlaceManager placeManger;
 
 	@Inject
@@ -73,6 +79,15 @@ public class StudyListView extends ViewImpl implements
 	    pager.setDisplay(dataGrid);
 
 	}
-	
+
+	@UiHandler("newStudyBtn")
+	public void onNewStudy(ClickEvent e) {
+		getUiHandlers().onNewStudy();
+	}
+
+	@Override
+	public void showAddBtn(boolean showAdd) {
+		newStudyBtn.setVisible(showAdd);		
+	}
 	
 }

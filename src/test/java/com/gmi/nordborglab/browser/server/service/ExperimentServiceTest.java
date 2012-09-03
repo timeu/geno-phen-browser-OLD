@@ -70,6 +70,7 @@ public class ExperimentServiceTest extends BaseTest {
 		assertNotNull(exp);
 	}
 	
+	@Ignore
 	@Test(expected=AccessDeniedException.class)
 	public void findExperimentAndThrowSecurityException() {
 		SecurityUtils.setAnonymousUser();
@@ -95,7 +96,7 @@ public class ExperimentServiceTest extends BaseTest {
 	}
 	
 	@Test
-	public void createServiceAndCheckPermissions() {
+	public void createExperimentAndCheckPermissions() {
 		createTestUser("ROLE_USER");
 		Experiment experiment = new Experiment();
 		experiment.setName("test");
@@ -135,9 +136,18 @@ public class ExperimentServiceTest extends BaseTest {
 	public void checkVisiblePermissionsWhenAdmin() {
 		createTestUser("ROLE_ADMIN");
 		Experiment experiment = service.findExperiment(1L);
-		assertTrue(experiment.isOwner());
+		assertTrue((experiment.getUserPermission().getMask() & BasePermission.WRITE.getMask()) == BasePermission.WRITE.getMask()); 
+		assertTrue((experiment.getUserPermission().getMask() & BasePermission.ADMINISTRATION.getMask()) == BasePermission.ADMINISTRATION.getMask());
 	}
 	
+	
+	@Test
+	public void checkNoEditPermissionWhenNoPermission() {
+		createTestUser("ROLE_USER");
+		Experiment experiment = service.findExperiment(1L);
+		assertFalse((experiment.getUserPermission().getMask() & BasePermission.WRITE.getMask()) == BasePermission.WRITE.getMask()); 
+		assertFalse((experiment.getUserPermission().getMask() & BasePermission.DELETE.getMask()) == BasePermission.DELETE.getMask());
+	}
 	
 	
 	
@@ -189,7 +199,4 @@ public class ExperimentServiceTest extends BaseTest {
 		userRepository.save(appUser);
 		SecurityUtils.makeActiveUser(SecurityUtils.TEST_USERNAME, SecurityUtils.TEST_PASSWORD,grantedAuthorities);
 	}
-	
-	
-	 
 }

@@ -101,7 +101,7 @@ public class CdvServiceImpl implements CdvService {
 			
 		study.setIsOwner(isOwner);
 		if (ace != null)
-			study.setUserPermission(new CustomAccessControlEntry(ace.getPermission().getMask(),ace.isGranting()));
+			study.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
 		return study;
 	}
 

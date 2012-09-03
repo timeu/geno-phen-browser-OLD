@@ -3,6 +3,7 @@ package com.gmi.nordborglab.browser.client.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gmi.nordborglab.browser.client.TabDataDynamic;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ProvidesResize;
@@ -62,12 +63,17 @@ public abstract class BaseTabPanel extends ResizeComposite implements TabPanel,P
 			tab.activate();
 		}
 		currentActiveTab = tab;
+		setTabVisibility((BaseTab)tab);
 	}
 
 	@Override
 	public void changeTab(Tab tab, TabData tabData, String historyToken) {
 		tab.setText(tabData.getLabel());
 		tab.setTargetHistoryToken(historyToken);
+		if (tabData instanceof TabDataDynamic) {
+			((BaseTab)tab).setCanUserAccess(((TabDataDynamic)tabData).hasAccess());
+		}
+		setTabVisibility((BaseTab)tab,true);
 	}
 
 	public void refreshTabs() {
@@ -77,7 +83,11 @@ public abstract class BaseTabPanel extends ResizeComposite implements TabPanel,P
 	}
 
 	private void setTabVisibility(BaseTab tab) {
-		boolean visible = (tab == currentActiveTab) || tab.canUserAccess();
+		setTabVisibility(tab, false);
+	}
+	
+	private void setTabVisibility(BaseTab tab,boolean overrideActiveTabCheck) {
+		boolean visible = ((tab == currentActiveTab) && !overrideActiveTabCheck)  || tab.canUserAccess();
 		tab.setVisible(visible);
 	}
 

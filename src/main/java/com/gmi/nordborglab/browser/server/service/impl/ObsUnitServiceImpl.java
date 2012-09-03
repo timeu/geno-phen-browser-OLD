@@ -65,4 +65,22 @@ public class ObsUnitServiceImpl implements ObsUnitService {
 		return page;
 	}
 
+	@Override
+	public List<ObsUnit> findObsUnitWithNoGenotype(Long phenotypeId,
+			Long alleleAssayId) {
+		final List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
+		final ImmutableList<Permission> permissions = ImmutableList
+				.of(BasePermission.READ);
+		ObjectIdentity oid = new ObjectIdentityImpl(TraitUom.class,phenotypeId);
+		Acl acl = aclService.readAclById(oid, authorities);
+		try {
+			if (!acl.isGranted(permissions, authorities, false)) 
+				throw new AccessDeniedException("not allowed");
+		}
+		catch (NotFoundException e) {
+			throw new AccessDeniedException("not allowed");
+		}
+		return obsUnitRepository.findAllWithNoGenotype(phenotypeId, alleleAssayId);
+	}
+
 }

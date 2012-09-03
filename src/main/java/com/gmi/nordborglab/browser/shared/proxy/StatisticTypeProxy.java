@@ -8,8 +8,11 @@ import com.google.web.bindery.requestfactory.shared.ProxyFor;
 @ProxyFor(value=StatisticType.class, locator=SpringEntitiyLocator.class)
 public interface StatisticTypeProxy extends EntityProxy {
 
+	public void setId(Long id);
 	public Long getId();
 
 	public String getStatType();
 	public void setStatType(String statType);
+
+	
 }

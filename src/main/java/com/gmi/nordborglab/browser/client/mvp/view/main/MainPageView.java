@@ -145,7 +145,9 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	}
 
 	@Override
-	public void showLoadingIndicator(boolean show) {
+	public void showLoadingIndicator(boolean show,String text) {
+		//text = text + "test";
+		loadingIndicator.setInnerText(text);
 		loadingIndicator.getStyle().setDisplay(show ? Display.BLOCK : Display.NONE);
 	}
 	

@@ -1,5 +1,7 @@
 package com.gmi.nordborglab.browser.client.gin;
 
+import com.gmi.nordborglab.browser.client.CurrentUser;
+import com.gmi.nordborglab.browser.client.IsLoggedInGatekeeper;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.DiversityPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailTabPresenter;
@@ -24,6 +26,10 @@ import com.google.gwt.inject.client.Ginjector;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentPermissionPresenter;
+import com.gmi.nordborglab.browser.shared.service.AppUserFactory;
+import com.gmi.nordborglab.browser.shared.service.HelperFactory;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyWizardPresenter;
 
 
 @GinModules({ClientDispatchModule.class,ClientModule.class})
@@ -48,4 +54,10 @@ public interface ClientGinjector extends Ginjector{
 	AsyncProvider<StudyTabPresenter> getStudyTabPresenter();
 	AsyncProvider<StudyDetailPresenter> getStudyDetailPresenter();
 	AsyncProvider<StudyGWASPlotPresenter> getStudyGWASPlotPresenter();
+	AsyncProvider<ExperimentPermissionPresenter> getExperimentPermissionPresenter();
+	IsLoggedInGatekeeper getLoggedInGatekeeper();
+	CurrentUser getCurrentUser();
+	AppUserFactory getAppUserFactory();
+	AsyncProvider<StudyWizardPresenter> getStudyWizardPresenter();
+	HelperFactory getHelperFactory();
 }

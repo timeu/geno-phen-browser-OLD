@@ -90,7 +90,6 @@ public class OpenIdUserDetailsService implements UserDetailsService,
 		}
 		appUser = new AppUser(id);
 		appUser.setEmail(email);
-		appUser.setUsername(email);
 		appUser.setPassword("unused");
 		appUser.setFirstname(firstName);
 		appUser.setLastname(lastName);

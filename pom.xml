@@ -44,9 +44,29 @@
 			<name>Spring Maven MILESTONE Repository</name>
 			<url>http://repo.springsource.org/libs-milestone</url>
 		</repository>
+		<repository>
+			<id>gwtquery-plugins</id>
+			<name>gwtquery-plugins</name>
+			<url>http://gwtquery-plugins.googlecode.com/svn/mavenrepo</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
+	 <dependency>
+     <groupId>com.googlecode.gwtquery</groupId>
+     <artifactId>gwtquery</artifactId>
+     <version>1.2.0</version>
+     <!-- If you are using old versions of gwt, uncomment the appropriate line -->
+     <!-- <classifier>2.1.0</classifier> -->
+     <!-- <classifier>2.0.1</classifier> -->
+     <scope>provided</scope>
+   </dependency>
+	<dependency>
+        	<groupId>com.watopi</groupId>
+            <artifactId>gwtchosen</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-servlet</artifactId>
@@ -174,6 +194,12 @@
 			<version>4.2.0.Final</version>
 		</dependency>
 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>4.2.0.Final</version>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901-1.jdbc4</version>
@@ -182,6 +208,7 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>1.9.0</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -240,40 +267,40 @@
 			<type>pom</type>
 		</dependency>
 		<dependency>
-      <groupId>net.sf.jpasecurity</groupId>
-      <artifactId>jpasecurity-core</artifactId>
-      <version>${jpasecurity.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jpasecurity</groupId>
-      <artifactId>jpasecurity-jpa</artifactId>
-      <version>${jpasecurity.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.jpasecurity</groupId>
-      <artifactId>jpasecurity-spring</artifactId>
-      <version>${jpasecurity.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.google.guava</groupId>
-    	<artifactId>guava</artifactId>
-    	<version>12.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.google.visualization</groupId>
-    	<artifactId>visualization-datasource</artifactId>
-    	<version>1.1.1</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.google.guava</groupId>
-    	<artifactId>guava-gwt</artifactId>
-    	<version>12.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.google.code.gson</groupId>
-    	<artifactId>gson</artifactId>
-    	<version>2.2.2</version>
-    </dependency>
+			<groupId>net.sf.jpasecurity</groupId>
+			<artifactId>jpasecurity-core</artifactId>
+			<version>${jpasecurity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jpasecurity</groupId>
+			<artifactId>jpasecurity-jpa</artifactId>
+			<version>${jpasecurity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jpasecurity</groupId>
+			<artifactId>jpasecurity-spring</artifactId>
+			<version>${jpasecurity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.visualization</groupId>
+			<artifactId>visualization-datasource</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-gwt</artifactId>
+			<version>12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -281,50 +308,80 @@
 		<outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
 
 		<plugins>
-		<plugin>
-        <groupId>org.bsc.maven</groupId>
-        <artifactId>maven-processor-plugin</artifactId>
-        <version>2.0.5</version>
-        <executions>
-          <execution>
-            <id>process</id>
-            <goals>
-              <goal>process</goal>
-            </goals>
-            <phase>generate-sources</phase>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>com.google.web.bindery</groupId>
-            <artifactId>requestfactory-apt</artifactId>
-            <version>${gwt.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
 
-      <!-- Google Plugin for Eclipse (GPE) won't see the source
-           generated above by requestfactory-apt unless it is exposed
-           as an additional source dir-->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/generated-sources/apt</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+				<version>6.1.10</version>
+				<configuration>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopKey>foo</stopKey>
+					<stopPort>9999</stopPort>
+				</configuration>
+				<executions>
+					<execution>
+						<id>start-jetty</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<scanIntervalSeconds>0</scanIntervalSeconds>
+							<daemon>true</daemon>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-jetty</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>2.0.5</version>
+				<executions>
+					<execution>
+						<id>process</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<phase>generate-sources</phase>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.web.bindery</groupId>
+						<artifactId>requestfactory-apt</artifactId>
+						<version>${gwt.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<!-- Google Plugin for Eclipse (GPE) won't see the source generated above 
+				by requestfactory-apt unless it is exposed as an additional source dir -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/apt</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<!-- GWT Maven Plugin -->
 			<plugin>
@@ -387,9 +444,8 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
+										<ignore></ignore>
+										<!-- <execute> <runOnIncremental>false</runOnIncremental> </execute> -->
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -402,9 +458,8 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
+										<ignore></ignore>
+										<!-- <execute> <runOnIncremental>false</runOnIncremental> </execute> -->
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -417,7 +472,8 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute />
+										<!-- <execute /> -->
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

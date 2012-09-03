@@ -9,4 +9,5 @@ public interface CustomRequestFactory extends RequestFactory{
 	HelperRequest helperRequest();
 	ObsUnitRequest obsUnitRequest();
 	CdvRequest cdvRequest();
+	PermissionRequest permissionRequest();
 }

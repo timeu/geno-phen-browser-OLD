@@ -73,14 +73,12 @@ public class ExperimentDetailView extends ViewWithUiHandlers<ExperimentDetailUiH
 	public void setState(State state,int permission) {
 		this.state = state;
 		experimentDisplayEditor.setVisible(state == State.DISPLAYING);
-		if (permission > 0 ) {
-			experimentEditEditor.setVisible((state == State.EDITING || state == State.SAVING) && (permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
-			edit.setVisible(state == State.DISPLAYING && 
-					(permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
-			save.setVisible(state == State.EDITING && (permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
-			cancel.setVisible(state == State.EDITING && (permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
-			delete.setVisible(state == State.EDITING && (permission & AccessControlEntryProxy.DELETE) == AccessControlEntryProxy.DELETE);
-		}
+		experimentEditEditor.setVisible((state == State.EDITING || state == State.SAVING) && (permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
+		edit.setVisible(state == State.DISPLAYING && 
+				(permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
+		save.setVisible(state == State.EDITING && (permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
+		cancel.setVisible(state == State.EDITING && (permission & AccessControlEntryProxy.WRITE) == AccessControlEntryProxy.WRITE);
+		delete.setVisible(state == State.EDITING && (permission & AccessControlEntryProxy.DELETE) == AccessControlEntryProxy.DELETE);
 	}
 
 	@Override

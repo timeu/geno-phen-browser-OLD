@@ -51,11 +51,14 @@ public class ExperimentServiceImpl extends WebApplicationObjectSupport
 	@Transactional(readOnly = false)
 	@Override
 	public Experiment save(Experiment experiment) {
-		CumulativePermission permission = new CumulativePermission();
-		permission.set(BasePermission.ADMINISTRATION);
 		experiment = experimentRepository.save(experiment);
-		addPermission(experiment, new PrincipalSid(SecurityUtil.getUsername()),
+		if (experiment.getId() == null) {
+			CumulativePermission permission = new CumulativePermission();
+			permission.set(BasePermission.ADMINISTRATION);
+			addPermission(experiment, new PrincipalSid(SecurityUtil.getUsername()),
 				permission);
+		}
+		experiment = setPermissionAndOwner(experiment);
 		return experiment;
 	}
 
@@ -90,6 +93,11 @@ public class ExperimentServiceImpl extends WebApplicationObjectSupport
 	@Override
 	public Experiment findExperiment(Long id) {
 		Experiment experiment = experimentRepository.findOne(id);
+		experiment = setPermissionAndOwner(experiment);
+		return experiment;
+	}
+	
+	private Experiment setPermissionAndOwner(Experiment experiment) {
 		List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
 		ObjectIdentity oid = new ObjectIdentityImpl(Experiment.class,
 				experiment.getId());
@@ -101,10 +109,15 @@ public class ExperimentServiceImpl extends WebApplicationObjectSupport
 				break;
 			}
 		}
-		AccessControlEntry ace = acl.getEntries().get(0);
+		for (AccessControlEntry ace: acl.getEntries()) {
+			if (authorities.contains(ace.getSid())) {
+				experiment.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
+				break;
+			}
+		}
+		
 		experiment.setIsOwner(isOwner);
-		experiment.setUserPermission(new CustomAccessControlEntry(ace.getPermission().getMask(),ace.isGranting()));
-		experiment.setNumberOfPhenotypes(traitUomService.countPhenotypeByExperimentCount(id));
+		experiment.setNumberOfPhenotypes(traitUomService.countPhenotypeByExperimentCount(experiment.getId()));
 		return experiment;
 	}
 }

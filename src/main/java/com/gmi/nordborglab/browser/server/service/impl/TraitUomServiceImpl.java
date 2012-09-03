@@ -6,8 +6,11 @@ import javax.annotation.Resource;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.CumulativePermission;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.MutableAclService;
@@ -103,8 +106,29 @@ public class TraitUomServiceImpl implements TraitUomService {
 	@Override
 	public TraitUom findPhenotype(Long id) {
 		TraitUom traitUom = traitUomRepository.findOne(id);
+		traitUom = setPermissionAndOwner(traitUom);
+		return traitUom;
+	}
+
+	@Override
+	@Transactional(readOnly = false)
+	public TraitUom save(TraitUom trait) {
+		if (trait.getId() == null)
+			throw new RuntimeException("use create method for adding new traits");
+		trait = traitUomRepository.save(trait);
+//		if (trait.getId() == null) {
+//			CumulativePermission permission = new CumulativePermission();
+//			permission.set(BasePermission.ADMINISTRATION);
+//			addPermission(experiment, new PrincipalSid(SecurityUtil.getUsername()),
+//				permission);
+//		}
+		trait = setPermissionAndOwner(trait);
+		return trait;
+	}
+
+	private TraitUom setPermissionAndOwner(TraitUom traitUom) {
 		List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
-		ObjectIdentity oid = new ObjectIdentityImpl(TraitUom.class,
+		ObjectIdentity oid = new ObjectIdentityImpl(Experiment.class,
 				traitUom.getId());
 		Acl acl = aclService.readAclById(oid, authorities);
 		boolean isOwner = false;
@@ -114,17 +138,15 @@ public class TraitUomServiceImpl implements TraitUomService {
 				break;
 			}
 		}
-		AccessControlEntry ace = null;
-		if (acl.getEntries().size() > 0)
-			 ace = acl.getEntries().get(0);
-		else if (acl.getParentAcl().getEntries().size() > 0)
-			ace = acl.getParentAcl().getEntries().get(0);
-			
+		for (AccessControlEntry ace: acl.getEntries()) {
+			if (authorities.contains(ace.getSid())) {
+				traitUom.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
+				break;
+			}
+		}
 		traitUom.setIsOwner(isOwner);
-		if (ace != null)
-			traitUom.setUserPermission(new CustomAccessControlEntry(ace.getPermission().getMask(),ace.isGranting()));
-		traitUom.setNumberOfObsUnits(traitUomRepository.countObsUnitsByPhenotypeId(id));
-		traitUom.setNumberOfStudies(traitUomRepository.countStudiesByPhenotypeId(id));
+		traitUom.setNumberOfObsUnits(traitUomRepository.countObsUnitsByPhenotypeId(traitUom.getId()));
+		traitUom.setNumberOfStudies(traitUomRepository.countStudiesByPhenotypeId(traitUom.getId()));
 		return traitUom;
 	}
 }

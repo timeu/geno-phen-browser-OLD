@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,6 +13,7 @@ import javax.annotation.Resource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +23,7 @@ import com.gmi.nordborglab.browser.server.domain.acl.AppUser;
 import com.gmi.nordborglab.browser.server.domain.acl.Authority;
 import com.gmi.nordborglab.browser.server.domain.pages.TraitUomPage;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
+import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
 import com.gmi.nordborglab.browser.server.repository.UserRepository;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 import com.gmi.nordborglab.browser.server.testutils.SecurityUtils;
@@ -32,6 +33,9 @@ public class TraitUomServiceTest extends BaseTest {
 	
 	@Resource
 	private TraitUomService service;
+	
+	@Resource
+	private TraitUomRepository repository;
 	
 	@Resource 
 	private UserRepository userRepository;
@@ -85,7 +89,48 @@ public class TraitUomServiceTest extends BaseTest {
 		createTestUser("ROLE_ADMIN");
 		TraitUom phenotype = service.findPhenotype(1L);
 		assertTrue(phenotype.isOwner());
+		assertTrue((phenotype.getUserPermission().getMask() & BasePermission.WRITE.getMask()) == BasePermission.WRITE.getMask()); 
+		assertTrue((phenotype.getUserPermission().getMask() & BasePermission.ADMINISTRATION.getMask()) == BasePermission.ADMINISTRATION.getMask());
 	}
+	
+	
+	
+	
+	@Test
+	public void checkNoEditPermissionWhenNoPermission() {
+		createTestUser("ROLE_USER");
+		TraitUom phenotype = service.findPhenotype(1L);
+		assertFalse((phenotype.getUserPermission().getMask() & BasePermission.WRITE.getMask()) == BasePermission.WRITE.getMask()); 
+		assertFalse((phenotype.getUserPermission().getMask() & BasePermission.DELETE.getMask()) == BasePermission.DELETE.getMask());
+	}
+	
+	
+	
+
+	@Test(expected=AccessDeniedException.class)
+	public void checkPermissionToModifyExperiment() {
+		createTestUser("ROLE_USER");
+		TraitUom phenotype = repository.findOne(1L);
+		phenotype.setLocalTraitName("test");
+		service.save(phenotype);
+	}
+	
+	@Test(expected=AccessDeniedException.class)
+	public void checkAnonymousNotAllowedToEdit() {
+		SecurityUtils.setAnonymousUser();
+		TraitUom phenotype = repository.findOne(1L);
+		phenotype.setLocalTraitName("test");
+		service.save(phenotype);
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void checkSaveNotForCreate() {
+		createTestUser("ROLE_ADMIN");
+		TraitUom phenotype = new TraitUom();
+		phenotype.setLocalTraitName("test");
+		service.save(phenotype);
+	}
+	
 	
 	private void createTestUser(String role) {
 		AppUser appUser = new AppUser("test@test.at");

@@ -1,6 +1,7 @@
 package com.gmi.nordborglab.browser.server.repository;
 
 import static org.junit.Assert.assertEquals;
+import static com.gmi.nordborglab.browser.server.domain.specifications.AppUserSpecifications.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -13,7 +14,9 @@ import org.junit.Test;
 
 import com.gmi.nordborglab.browser.server.domain.acl.AppUser;
 import com.gmi.nordborglab.browser.server.domain.acl.Authority;
+import com.gmi.nordborglab.browser.server.domain.specifications.AppUserSpecifications;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
+import com.google.gwt.i18n.shared.FirstStrongDirectionEstimator;
 
 
 
@@ -51,6 +54,20 @@ public class UserRepositoryTest extends BaseTest {
 		assertEquals(1L, actual.getAuthorities().size());
 		assertEquals("ROLE_USER", actual.getAuthorities().get(0).getAuthority());
 		assertEquals(actual,actual.getAuthorities().get(0).getUser());
+	}
+	
+	@Test
+	public void testFindByFirstName() {
+		List<AppUser> users = repository.findAll(firstNameIsLike("Fer"));
+		assertEquals(1, users.size());
+		assertEquals("Fernando", users.get(0).getFirstname());
+	}
+	
+	@Test
+	public void testFindByLastName() {
+		List<AppUser> users = repository.findAll(lastNameIsLike("Rab"));
+		assertEquals(1, users.size());
+		assertEquals("Rabanal", users.get(0).getLastname());
 	}
 
 }

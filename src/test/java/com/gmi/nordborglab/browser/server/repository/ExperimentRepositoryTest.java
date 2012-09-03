@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,6 +62,7 @@ public class ExperimentRepositoryTest extends BaseTest{
 		assertEquals(5,page.getNumberOfElements());
 	}
 	
+	@Ignore
 	@Test
 	public void findByUserRole() {
 		List<String> permissions = new ArrayList<String>();
@@ -76,6 +78,7 @@ public class ExperimentRepositoryTest extends BaseTest{
 		assertEquals(2, page.getContent().get(1).getId().intValue());
 	}
 	
+	@Ignore
 	@Test
 	public void findByAnonymousUser() {
 		List<String> permissions = new ArrayList<String>();

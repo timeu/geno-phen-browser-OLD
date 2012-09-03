@@ -45,7 +45,8 @@ public class Study extends BaseEntity {
 	private Boolean isdone;
 	
 	@Transient
-	private CustomAccessControlEntry userPermission = new CustomAccessControlEntry(0, true);
+	private CustomAccessControlEntry userPermission = new CustomAccessControlEntry(0L, 0, true);
+	
 	@Transient 
 	boolean isOwner = false;
 	

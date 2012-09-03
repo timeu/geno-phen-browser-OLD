@@ -12,6 +12,7 @@ import com.gwtplatform.mvp.client.annotations.ChangeTab;
 import com.gwtplatform.mvp.client.annotations.ContentSlot;
 import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.annotations.RequestTabs;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
 import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
@@ -47,6 +48,16 @@ public class ExperimentDetailTabPresenter
 	@Override
 	protected void revealInParent() {
 		RevealContentEvent.fire(this, DiversityPresenter.TYPE_SetMainContent, this);
+	}
+	
+	@Override
+	public void prepareFromRequest(PlaceRequest placeRequest) {
+		super.prepareFromRequest(placeRequest);
+	}
+	
+	@Override
+	protected void onReset() {
+		super.onReset();
 	}
 
 	@Override

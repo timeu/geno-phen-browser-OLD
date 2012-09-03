@@ -1,14 +1,16 @@
 package com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype;
 
+import com.gmi.nordborglab.browser.client.CurrentUser;
 import com.gmi.nordborglab.browser.client.NameTokens;
 import com.gmi.nordborglab.browser.client.ParameterizedPlaceRequest;
 import com.gmi.nordborglab.browser.client.TabDataDynamic;
 import com.gmi.nordborglab.browser.client.events.DisplayNotificationEvent;
 import com.gmi.nordborglab.browser.client.events.LoadPhenotypeEvent;
 import com.gmi.nordborglab.browser.client.events.LoadingIndicatorEvent;
-import com.gmi.nordborglab.browser.client.manager.ObsUnitManager;
-import com.gmi.nordborglab.browser.client.manager.PhenotypeManager;
 import com.gmi.nordborglab.browser.client.manager.CdvManager;
+import com.gmi.nordborglab.browser.client.manager.PhenotypeManager;
+import com.gmi.nordborglab.browser.client.mvp.handlers.StudyListUiHandlers;
+import com.gmi.nordborglab.browser.shared.proxy.AccessControlEntryProxy;
 import com.gmi.nordborglab.browser.shared.proxy.PhenotypeProxy;
 import com.gmi.nordborglab.browser.shared.proxy.StudyPageProxy;
 import com.gmi.nordborglab.browser.shared.proxy.StudyProxy;
@@ -20,6 +22,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.TabData;
 import com.gwtplatform.mvp.client.View;
@@ -33,11 +36,13 @@ import com.gwtplatform.mvp.client.proxy.RevealContentEvent;
 import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
 public class StudyListPresenter extends
-		Presenter<StudyListPresenter.MyView, StudyListPresenter.MyProxy> {
+		Presenter<StudyListPresenter.MyView, StudyListPresenter.MyProxy> implements StudyListUiHandlers{
 
-	public interface MyView extends View {
+	public interface MyView extends View,HasUiHandlers<StudyListUiHandlers> {
 
 		HasData<StudyProxy> getDisplay();
+
+		void showAddBtn(boolean showAdd);
 	}
 	
 	protected PhenotypeProxy phenotype;
@@ -48,6 +53,7 @@ public class StudyListPresenter extends
 	protected final CdvManager cdvManager;
 	protected boolean fireLoadEvent = false;
 	protected final AsyncDataProvider<StudyProxy> dataProvider;
+	protected final CurrentUser currentUser;
 
 	@ProxyCodeSplit
 	@NameToken(NameTokens.studylist)
@@ -58,8 +64,11 @@ public class StudyListPresenter extends
 	@Inject
 	public StudyListPresenter(final EventBus eventBus, final MyView view,
 			final MyProxy proxy, final PlaceManager placeManager,
-			final PhenotypeManager phenotypeManager, final CdvManager cdvManager) {
+			final PhenotypeManager phenotypeManager, final CdvManager cdvManager, 
+			final CurrentUser currentUser) {
 		super(eventBus, view, proxy);
+		getView().setUiHandlers(this);
+		this.currentUser= currentUser;
 		this.placeManager = placeManager;
 		this.phenotypeManager = phenotypeManager;
 		this.cdvManager = cdvManager;
@@ -85,6 +94,7 @@ public class StudyListPresenter extends
 			fireLoadEvent = false;
 		}
 		LoadingIndicatorEvent.fire(this, false);
+		checkPermissionAndUpdateView();
 	}
 
 	@Override
@@ -108,7 +118,7 @@ public class StudyListPresenter extends
 				return;
 			}
 			if (phenotype == null || !phenotype.getId().equals(phenotypeIdToLoad)) {
-				phenotypeManager.getContext().findPhenotype(phenotypeIdToLoad).fire(new Receiver<PhenotypeProxy>() {
+				phenotypeManager.getContext().findPhenotype(phenotypeIdToLoad).with("userPermission").fire(new Receiver<PhenotypeProxy>() {
 	
 					@Override
 					public void onSuccess(PhenotypeProxy response) {
@@ -174,5 +184,18 @@ public class StudyListPresenter extends
 			
 		};
 		cdvManager.findStudiesByPhenotypeId(receiver,phenotypeId, range.getStart(), range.getLength());
+	}
+
+	@Override
+	public void onNewStudy() {
+		PlaceRequest request = new ParameterizedPlaceRequest(NameTokens.studywizard).with("id", phenotypeId.toString());
+		placeManager.revealPlace(request);
+	}
+	
+	protected void checkPermissionAndUpdateView() {
+		int permission = currentUser.getPermissionMask(phenotype.getUserPermission());
+		boolean showAdd = (((permission & AccessControlEntryProxy.CREATE) == AccessControlEntryProxy.CREATE) || 
+			((permission & AccessControlEntryProxy.ADMINISTRATION) == AccessControlEntryProxy.ADMINISTRATION));
+		getView().showAddBtn(showAdd);
 	}
 }

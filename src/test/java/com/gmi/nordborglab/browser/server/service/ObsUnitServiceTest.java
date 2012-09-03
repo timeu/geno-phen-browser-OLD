@@ -1,6 +1,7 @@
 package com.gmi.nordborglab.browser.server.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
+import com.gmi.nordborglab.browser.server.domain.observation.ObsUnit;
 import com.gmi.nordborglab.browser.server.domain.pages.ObsUnitPage;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 import com.gmi.nordborglab.browser.server.testutils.SecurityUtils;
@@ -53,6 +55,14 @@ public class ObsUnitServiceTest extends BaseTest {
 		assertEquals(50, page.getNumberOfElements());
 		assertEquals(50, page.getContent().size());
 	}
+	
+	@Test
+	public void testFindObsUnitsWithNoGenotype() {
+		SecurityUtils.setAnonymousUser();
+		List<ObsUnit> obsUnits = service.findObsUnitWithNoGenotype(1L, 1L);
+		assertNotNull("nothin returned",obsUnits);
+		assertEquals("Wrong number returned",0, obsUnits.size());
+	}
 
 	@Test(expected=AccessDeniedException.class)
 	public void testFindObsUnitsByPhenotypeIdAccessedDenied() {
@@ -72,5 +82,26 @@ public class ObsUnitServiceTest extends BaseTest {
 		aclService.updateAcl(acl);
 		SecurityUtils.setAnonymousUser();
 		ObsUnitPage page = service.findObsUnits(1L, 0, 50);
+	}
+	
+
+	@Test(expected=AccessDeniedException.class)
+	public void testFindObsUnitsWithNoGenotypeAccessedDenied() {
+		Collection<? extends GrantedAuthority> adminAuthorities = ImmutableList.of(new SimpleGrantedAuthority("ROLE_ADMIN")).asList();
+	    SecurityUtils.makeActiveUser("TEST", "TEST",adminAuthorities);
+		ObjectIdentity oid = new ObjectIdentityImpl(Experiment.class,1L);
+		List<Sid> authorities = Collections.singletonList((Sid)new GrantedAuthoritySid("ROLE_ANONYMOUS"));
+		MutableAcl acl = (MutableAcl)aclService.readAclById(oid, authorities);
+		
+		for (int i=0;i<acl.getEntries().size();i++) {
+			if (acl.getEntries().get(i).getSid().equals(authorities.get(0)))
+			{
+				acl.deleteAce(i);
+				break;
+			}
+		}
+		aclService.updateAcl(acl);
+		SecurityUtils.setAnonymousUser();
+		List<ObsUnit> obsUnits = service.findObsUnitWithNoGenotype(1L, 1L);
 	}
 }

@@ -13,4 +13,6 @@ public interface PhenotypeRequest extends RequestContext{
 	Request<PhenotypePageProxy> findPhenotypesByExperiment(Long id,int start,int size);
 
 	Request<PhenotypeProxy> findPhenotype(Long id);
+
+	Request<PhenotypeProxy> save(PhenotypeProxy phenotype);
 }

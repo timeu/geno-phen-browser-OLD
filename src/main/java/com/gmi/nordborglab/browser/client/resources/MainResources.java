@@ -19,6 +19,7 @@ public interface MainResources extends ClientBundle{
 		String button();
 		String button_grey();
 		String button_blue();
+		String button_red();
 		String cursor();
 	}
 

@@ -11,14 +11,21 @@ public interface PhenotypeProxy extends EntityProxy{
 	Long getId();
 	
 	UnitOfMeasureProxy getUnitOfMeasure();
+	
+	void setUnitOfMeasure(UnitOfMeasureProxy unitOfMeasure);
 
 	String getLocalTraitName();
+	
+	void setLocalTraitName(String localTraitName);
 
 	String getTraitProtocol();
+	void setTraitProtocol(String traitProtocol);
 
 	String getToAccession();
+	void setToAccession(String toAccession);
 	
 	String getEoAccession();
+	void setEoAccession(String eoAccession);
 
 	boolean isOwner();
 	

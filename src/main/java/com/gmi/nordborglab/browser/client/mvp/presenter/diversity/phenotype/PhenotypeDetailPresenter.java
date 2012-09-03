@@ -1,9 +1,18 @@
 package com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+
 import com.gmi.nordborglab.browser.client.CurrentUser;
 import com.gmi.nordborglab.browser.client.NameTokens;
 import com.gmi.nordborglab.browser.client.ParameterizedPlaceRequest;
 import com.gmi.nordborglab.browser.client.TabDataDynamic;
+import com.gmi.nordborglab.browser.client.events.DisplayNotificationEvent;
 import com.gmi.nordborglab.browser.client.events.LoadExperimentEvent;
 import com.gmi.nordborglab.browser.client.events.LoadPhenotypeEvent;
 import com.gmi.nordborglab.browser.client.events.LoadingIndicatorEvent;
@@ -11,10 +20,17 @@ import com.gmi.nordborglab.browser.client.manager.PhenotypeManager;
 import com.gmi.nordborglab.browser.client.mvp.handlers.PhenotypeDetailUiHandlers;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailPresenter.State;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.phenotype.PhenotypeDetailView.PhenotypeDisplayDriver;
+import com.gmi.nordborglab.browser.client.mvp.view.diversity.phenotype.PhenotypeDetailView.PhenotypeEditDriver;
+import com.gmi.nordborglab.browser.shared.proxy.ExperimentProxy;
 import com.gmi.nordborglab.browser.shared.proxy.PhenotypeProxy;
+import com.gmi.nordborglab.browser.shared.proxy.UnitOfMeasureProxy;
+import com.gmi.nordborglab.browser.shared.service.ExperimentRequest;
+import com.gmi.nordborglab.browser.shared.service.PhenotypeRequest;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -40,13 +56,18 @@ public class PhenotypeDetailPresenter
 		void setState(State state, int permission);
 
 		State getState();
+
+		PhenotypeEditDriver getEditDriver();
+
+		void setAcceptableValuesForUnitOfMeasure(
+				Collection<UnitOfMeasureProxy> values);
 	}
 	protected PhenotypeProxy phenotype;
 	protected boolean fireLoadEvent;
 	protected final PlaceManager placeManager; 
 	protected final PhenotypeManager phenotypeManager;
 	protected final CurrentUser currentUser;
-	
+	protected final Receiver<PhenotypeProxy> receiver;
 	
 	@ProxyCodeSplit
 	@NameToken(NameTokens.phenotype)
@@ -60,9 +81,31 @@ public class PhenotypeDetailPresenter
 			final PhenotypeManager phenotypeManager, 
 			final CurrentUser currentUser) {
 		super(eventBus, view, proxy);
+		getView().setUiHandlers(this);
 		this.placeManager = placeManager;
 		this.phenotypeManager = phenotypeManager;
 		this.currentUser = currentUser;
+		getView().setAcceptableValuesForUnitOfMeasure(currentUser.getAppData().getUnitOfMeasureList());
+		receiver = new Receiver<PhenotypeProxy>() {
+			public void onSuccess(PhenotypeProxy response) {
+				phenotype = response;
+				fireEvent(new LoadPhenotypeEvent(phenotype));
+				getView().setState(State.DISPLAYING,getPermission());
+				getView().getDisplayDriver().display(phenotype);
+			}
+
+
+			public void onFailure(ServerFailure error) {
+				fireEvent(new DisplayNotificationEvent("Error while saving",error.getMessage(),true,DisplayNotificationEvent.LEVEL_ERROR,0));
+				onEdit();
+			}
+
+			public void onConstraintViolation(
+					Set<ConstraintViolation<?>> violations) {
+				super.onConstraintViolation(violations);
+				getView().setState(State.EDITING,getPermission());
+			}
+		};
 	}
 
 	@Override
@@ -124,20 +167,24 @@ public class PhenotypeDetailPresenter
 
 	@Override
 	public void onEdit() {
-		// TODO Auto-generated method stub
-		
+		getView().setState(State.EDITING,getPermission());
+		PhenotypeRequest ctx = phenotypeManager.getContext();
+		getView().getEditDriver().edit(phenotype, ctx);
+		List<String> paths = ImmutableList.<String>builder().addAll(Arrays.asList(getView().getEditDriver().getPaths())).add("userPermission").build();
+		ctx.save(phenotype).with(paths.toArray(new String[0])).to(receiver);
 	}
 
 	@Override
 	public void onSave() {
-		// TODO Auto-generated method stub
-		
+		getView().setState(State.SAVING,getPermission());
+		RequestContext req = getView().getEditDriver().flush();
+		req.fire();
 	}
 
 	@Override
 	public void onCancel() {
-		// TODO Auto-generated method stub
-		
+		getView().setState(State.DISPLAYING,getPermission());
+		getView().getDisplayDriver().display(phenotype);
 	}
 
 	@Override
@@ -158,6 +205,13 @@ public class PhenotypeDetailPresenter
 		String historyToken  = placeManager.buildHistoryToken(request);
 		TabData tabData = getProxy().getTabData();
 		getProxy().changeTab(new TabDataDynamic(tabData.getLabel(), tabData.getPriority(), historyToken));
+	}
+	
+	private int getPermission() {
+		int permission = 0;
+		if (phenotype != null) 
+		    permission =  currentUser.getPermissionMask(phenotype.getUserPermission());
+		return permission;
 	}
 	
 	

@@ -11,6 +11,8 @@ public class NameTokens {
 	public static final String studylist = "phenotype/{id}/studylist";
 	public static final String study = "study/{id}/overview";
 	public static final String studygwas = "study/{id}/studygwas";
+	public static final String experimentPermission = "experiment/{id}/permission";
+	public static final String studywizard = "phenotype/{id}/studywizard";
 
 	public static String getHome() {
 		return home;
@@ -46,6 +48,14 @@ public class NameTokens {
 
 	public static String getStudygwas() {
 		return studygwas;
+	}
+
+	public static String getExperimentPermission() {
+		return experimentPermission;
+	}
+
+	public static String getStudywizard() {
+		return studywizard;
 	}
 	
 	

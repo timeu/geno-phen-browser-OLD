@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
@@ -14,7 +16,6 @@ import com.gmi.nordborglab.browser.server.domain.germplasm.Stock;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.observation.Locality;
 import com.gmi.nordborglab.browser.server.domain.observation.ObsUnit;
-import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 
 
@@ -68,6 +69,13 @@ public class ObsUnitRepositoryTest extends BaseTest{
 		assertEquals(trait.getExperiment().getId(), new Long(1L));
 	}
 	
+	
+	@Test
+	public void testFindAllObsUnitWithNoGenotype() {
+		List<ObsUnit> obsUnits = repository.findAllWithNoGenotype(1L,1L);
+		assertNotNull("nothing returned",obsUnits);
+		assertEquals(0, obsUnits.size());
+	}
 	
 	
 	

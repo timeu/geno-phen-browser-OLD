@@ -39,7 +39,7 @@
 	float: left;
 }
 
-.button,.button_blue,.button_grey {
+.button,.button_blue,.button_grey,.button_red {
 	-webkit-border-radius: 2px;
 	-moz-border-radius: 2px;
 	border-radius: 2px;
@@ -55,6 +55,28 @@
 	padding: 0 8px;
 	display: inline-block;
 	cursor: pointer;
+}
+
+.button_red {
+	background-color: #D14836;
+	background-image: literal("-webkit-linear-gradient(top,#DD4B39,#D14836)");
+	background-image: litear("-moz-linear-gradient(top,#DD4B39,#D14836)");
+	background-image: literal("-ms-linear-gradient(top,#DD4B39,#D14836)");
+	background-image: literal("-o-linear-gradient(top,#DD4B39,#D14836)");
+	background-image: linear-gradient(top, #DD4B39, #D14836);
+	border: 1px solid transparent;
+	color: white;
+}
+
+.button_red:hover {
+	background-color: #C53727;
+	background-image: literal("-webkit-linear-gradient(top,#DD4B39,#C53727)");
+	background-image: litear("-moz-linear-gradient(top,#DD4B39,#C53727)");
+	background-image: literal("-ms-linear-gradient(top,#DD4B39,#C53727)");
+	background-image: literal("-o-linear-gradient(top,#DD4B39,#C53727)");
+	background-image: linear-gradient(top, #DD4B39, #C53727);
+	border: 1px solid transparent;
+	color: white;
 }
 
 .button_blue {
@@ -97,4 +119,28 @@
 
 .cursor {
 	cursor: pointer;
+}
+
+@external gwt-ListBox;
+.gwt-ListBox {
+	padding: 5px 4px;
+	border: 1px solid #CCC;
+	border-top: 1px solid #999;
+	font-size: small;
+	font-family: Arial Unicode MS, Arial, sans-serif;
+	  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; 
+}
+
+@external gwt-TextBox;
+
+.gwt-TextBox {
+	  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; 
+	  
+}
+
+.gwt-TextBox:focus,.gwt-ListBox:focus {
+	    border:solid 1px #73A6FF;  
+        background:#EFF5FF;  
+        color:#000;
+        outline:none;
 }

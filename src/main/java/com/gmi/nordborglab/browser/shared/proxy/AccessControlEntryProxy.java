@@ -12,8 +12,16 @@ public interface AccessControlEntryProxy extends ValueProxy {
 	 public static final int CREATE = 1 << 2;
 	 public static final int DELETE = 1 << 3;
 	 public static final int ADMINISTRATION = 1 << 4;
-	
+	 
+	Long getId();
+	 
 	int getMask();
-	boolean isGranting();
+	void setMask(int mask);
+	
+	boolean getIsGranting();
+	void setIsGranting(boolean isGranting);
+	
+	PermissionPrincipalProxy getPrincipal();
+	void setPrincipal(PermissionPrincipalProxy principal);
 	
 }

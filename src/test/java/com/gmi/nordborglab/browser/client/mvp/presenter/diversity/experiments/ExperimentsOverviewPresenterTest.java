@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -89,6 +90,7 @@ public class ExperimentsOverviewPresenterTest extends PresenterTestBase {
 	}
 
 
+	@Ignore
 	@Test
 	public void testLoadExperimentNavigateToNewPlace() {
 		ExperimentProxy experiment = mock(ExperimentProxy.class);

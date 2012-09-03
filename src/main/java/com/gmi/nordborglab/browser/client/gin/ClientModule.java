@@ -1,5 +1,7 @@
 package com.gmi.nordborglab.browser.client.gin;
 
+import javax.validation.ValidatorFactory;
+
 import at.gmi.nordborglab.widgets.geneviewer.client.datasource.DataSource;
 import at.gmi.nordborglab.widgets.geneviewer.client.datasource.LocalStorageImpl;
 import at.gmi.nordborglab.widgets.geneviewer.client.datasource.LocalStorageImpl.TYPE;
@@ -7,6 +9,7 @@ import at.gmi.nordborglab.widgets.geneviewer.client.datasource.impl.JBrowseCache
 
 import com.gmi.nordborglab.browser.client.ClientPlaceManager;
 import com.gmi.nordborglab.browser.client.CurrentUser;
+import com.gmi.nordborglab.browser.client.IsLoggedInGatekeeper;
 import com.gmi.nordborglab.browser.client.NameTokens;
 import com.gmi.nordborglab.browser.client.ParameterizedParameterTokenFormatter;
 import com.gmi.nordborglab.browser.client.manager.CdvManager;
@@ -14,9 +17,11 @@ import com.gmi.nordborglab.browser.client.manager.ExperimentManager;
 import com.gmi.nordborglab.browser.client.manager.HelperManager;
 import com.gmi.nordborglab.browser.client.manager.ObsUnitManager;
 import com.gmi.nordborglab.browser.client.manager.PhenotypeManager;
+import com.gmi.nordborglab.browser.client.mvp.presenter.PermissionDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.DiversityPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentPermissionPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentsOverviewPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentsOverviewTabPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.PhenotypeListPresenter;
@@ -32,8 +37,10 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.home.dashboard.Dashboard
 import com.gmi.nordborglab.browser.client.mvp.presenter.main.MainPagePresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.main.UserInfoPresenter;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.DiversityView;
+import com.gmi.nordborglab.browser.client.mvp.view.diversity.PermissionDetailView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.experiments.ExperimentDetailTabView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.experiments.ExperimentDetailView;
+import com.gmi.nordborglab.browser.client.mvp.view.diversity.experiments.ExperimentPermissionView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.experiments.ExperimentsOverviewTabView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.experiments.ExperimentsOverviewView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.experiments.PhenotypeListView;
@@ -44,16 +51,20 @@ import com.gmi.nordborglab.browser.client.mvp.view.diversity.phenotype.StudyList
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyDetailView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyGWASPlotView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyTabView;
+import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyWizardView;
 import com.gmi.nordborglab.browser.client.mvp.view.home.HomeView;
 import com.gmi.nordborglab.browser.client.mvp.view.home.dashboard.DashboardView;
 import com.gmi.nordborglab.browser.client.mvp.view.main.MainPageView;
 import com.gmi.nordborglab.browser.client.mvp.view.main.UserInfoView;
 import com.gmi.nordborglab.browser.client.resources.FlagMap;
 import com.gmi.nordborglab.browser.client.resources.MainResources;
+import com.gmi.nordborglab.browser.client.validation.ClientValidatorFactory;
 import com.gmi.nordborglab.browser.shared.service.AppUserFactory;
 import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
+import com.gmi.nordborglab.browser.shared.service.HelperFactory;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.storage.client.Storage;
+import com.google.gwt.validation.client.impl.AbstractGwtValidator;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -66,6 +77,7 @@ import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalytics;
 import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalyticsImpl;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.TokenFormatter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyWizardPresenter;
 
 public class ClientModule extends AbstractPresenterModule {
 
@@ -74,6 +86,9 @@ public class ClientModule extends AbstractPresenterModule {
 		//install(new DefaultModule(ClientPlaceManager.class));
 		
 		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
+		
+		bind(IsLoggedInGatekeeper.class).in(Singleton.class);
+		
 	    //bind(TokenFormatter.class).to(ParameterTokenFormatter.class).in(Singleton.class);
 	    bind(RootPresenter.class).asEagerSingleton();
 	    bind(GoogleAnalytics.class).to(GoogleAnalyticsImpl.class).in(Singleton.class);
@@ -81,6 +96,7 @@ public class ClientModule extends AbstractPresenterModule {
 	    
 		bind(TokenFormatter.class).to(ParameterizedParameterTokenFormatter.class).in(Singleton.class);
 		bind(CurrentUser.class).asEagerSingleton();
+		bind(ValidatorFactory.class).to(ClientValidatorFactory.class);
 		bind(Cache.class).to(DefaultCacheImpl.class).in(Singleton.class);
 
 		bind(MainResources.class).in(Singleton.class);
@@ -93,6 +109,7 @@ public class ClientModule extends AbstractPresenterModule {
 		bindConstant().annotatedWith(DefaultPlace.class).to(NameTokens.home);
 
 		bind(AppUserFactory.class).asEagerSingleton();
+		bind(HelperFactory.class).asEagerSingleton();
 
 		bindPresenter(MainPagePresenter.class, MainPagePresenter.MyView.class,
 				MainPageView.class, MainPagePresenter.MyProxy.class);
@@ -164,6 +181,19 @@ public class ClientModule extends AbstractPresenterModule {
 		bindPresenter(StudyGWASPlotPresenter.class,
 				StudyGWASPlotPresenter.MyView.class, StudyGWASPlotView.class,
 				StudyGWASPlotPresenter.MyProxy.class);
+
+		bindPresenterWidget(PermissionDetailPresenter.class,
+				PermissionDetailPresenter.MyView.class,
+				PermissionDetailView.class);
+
+		bindPresenter(ExperimentPermissionPresenter.class,
+				ExperimentPermissionPresenter.MyView.class,
+				ExperimentPermissionView.class,
+				ExperimentPermissionPresenter.MyProxy.class);
+
+		bindPresenter(StudyWizardPresenter.class,
+				StudyWizardPresenter.MyView.class, StudyWizardView.class,
+				StudyWizardPresenter.MyProxy.class);
 	}
 
 	@Provides

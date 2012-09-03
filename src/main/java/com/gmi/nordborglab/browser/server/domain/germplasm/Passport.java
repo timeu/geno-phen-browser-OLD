@@ -1,14 +1,23 @@
 package com.gmi.nordborglab.browser.server.domain.germplasm;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.gmi.nordborglab.browser.server.domain.BaseEntity;
+import com.gmi.nordborglab.browser.server.domain.genotype.Allele;
 
 
 @Entity 
@@ -25,6 +34,13 @@ public class Passport extends BaseEntity{
     @JoinColumn(name="div_accession_collecting_id")
     private AccessionCollection collection;
     
+    @OneToMany(mappedBy="passport",cascade={CascadeType.PERSIST,CascadeType.MERGE})
+    private List<Stock> stocks = new ArrayList<Stock>();
+    
+    @OneToMany(mappedBy="passport",cascade={CascadeType.PERSIST,CascadeType.MERGE})
+	private Set<Allele> alleles = new HashSet<Allele>();
+    
+    
     private String accename;
     private String source;
     private String accenumb;
@@ -34,8 +50,6 @@ public class Passport extends BaseEntity{
     public Passport() {
     
     }
-
-	
 
 	public Taxonomy getTaxonomy() {
 		return taxonomy;
@@ -92,4 +106,13 @@ public class Passport extends BaseEntity{
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
+
+	public List<Stock> getStocks() {
+		return Collections.unmodifiableList(stocks);
+	}
+
+	public Set<Allele> getAlleles() {
+		return alleles;
+	}
+	
 }

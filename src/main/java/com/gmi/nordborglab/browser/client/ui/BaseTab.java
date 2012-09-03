@@ -1,5 +1,6 @@
 package com.gmi.nordborglab.browser.client.ui;
 
+import com.gmi.nordborglab.browser.client.TabDataDynamic;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -23,9 +24,13 @@ public abstract class BaseTab extends Composite implements Tab {
 	Style style;
 
 	private final float priority;
+	protected boolean canUserAccess = true;
 
 	public BaseTab(TabData tabData) {
 		super();
+		if (tabData instanceof TabDataDynamic) {
+			canUserAccess = ((TabDataDynamic)tabData).hasAccess();
+		}
 		this.priority = tabData.getPriority();
 	}
 
@@ -67,7 +72,11 @@ public abstract class BaseTab extends Composite implements Tab {
 	}
 	
 	public boolean canUserAccess() {
-	    return true;
+	    return canUserAccess;
+	}
+	
+	public void setCanUserAccess(boolean canUserAccess) {
+		this.canUserAccess = canUserAccess;
 	}
 
 }

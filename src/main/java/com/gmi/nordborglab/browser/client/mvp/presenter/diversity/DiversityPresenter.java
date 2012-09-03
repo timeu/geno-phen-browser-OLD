@@ -84,6 +84,10 @@ public class DiversityPresenter extends
 			title = "Study";
 			type ="study";
 		}
+		else if ( request.matchesNameToken(NameTokens.studywizard)) {
+			title = "Study";
+			type = "studywizard";
+		}
 		getView().setTitle(title);
 		Long id = null;
 		try {
@@ -109,6 +113,8 @@ public class DiversityPresenter extends
 						nameToken = NameTokens.phenotype ;
 					else if (item.getType().equals("study"))
 						nameToken = NameTokens.study ;
+					else if (item.getType().equals("studywizard")) 
+						nameToken = NameTokens.studywizard;
 					PlaceRequest request = new ParameterizedPlaceRequest(nameToken).with("id", item.getId().toString());
 					getView().setBreadcrumbs(i+1, item.getText(),placeManager.buildHistoryToken(request));
 				}

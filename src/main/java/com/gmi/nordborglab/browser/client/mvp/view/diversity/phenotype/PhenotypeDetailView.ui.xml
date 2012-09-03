@@ -26,7 +26,7 @@
 			<g:Anchor ui:field="cancel" visible="false" addStyleNames="{mainRes.style.cursor}">Cancel</g:Anchor>
 			<g:Anchor ui:field="delete" visible="false" addStyleNames="{mainRes.style.cursor}">Delete</g:Anchor>
 		</g:HTMLPanel>
-		<!-- <ed:ExperimentEditEditor ui:field="experimentEditEditor" visible="false"></ed:ExperimentEditEditor> -->
+		<ed:PhenotypeEditEditor ui:field="phenotypeEditEditor" visible="false"></ed:PhenotypeEditEditor>
 		<ed:PhenotypeDisplayEditor ui:field="phenotypeDisplayEditor"></ed:PhenotypeDisplayEditor>
 	</g:FlowPanel>
 </ui:UiBinder>

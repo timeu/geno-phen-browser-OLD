@@ -121,7 +121,4 @@ public class TraitUom extends BaseEntity {
 	public void setNumberOfStudies(Long numberOfStudies) {
 		this.numberOfStudies = numberOfStudies;
 	}
-
-	
-
 }

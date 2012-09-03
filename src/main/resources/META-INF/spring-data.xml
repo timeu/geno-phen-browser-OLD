@@ -25,7 +25,11 @@
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-
+	
+	<!-- <bean class="com.gmi.nordborglab.browser.server.transaction.manager.JpaTransactionManagerLookup" id ="transactionManagerLookup">
+		<property name="transactionManager" ref="transactionManager"/>	
+	</bean>
+ 	-->
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
 		p:packagesToScan="com.gmi.nordborglab.browser.server.domain"
