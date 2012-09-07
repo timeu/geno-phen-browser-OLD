@@ -66,12 +66,4 @@ public class ValidationValueBoxEditorDecorator<T> extends ValidationDecorator im
 		}
 		setError(sb.toString());
 	}
-	
-	public void setHelplabel(String text) {
-		setHelpLabel(text);
-	}
-	
-	public void setLabel(String text) {
-		label.setInnerText(text);
-	}
 }

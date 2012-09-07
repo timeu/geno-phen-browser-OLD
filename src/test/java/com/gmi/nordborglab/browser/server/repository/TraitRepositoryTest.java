@@ -4,10 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
 
+import com.gmi.nordborglab.browser.server.domain.observation.ObsUnit;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.Trait;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
@@ -47,6 +50,20 @@ public class TraitRepositoryTest extends BaseTest{
 		Trait actual = repository.save(created);
 		assertTrait(actual);
 		TraitUomRepositoryTest.assertTraitUom(actual.getTraitUom());
+	}
+	
+	@Test
+	public void testFindAllTraitValues() {
+		List<Trait> traits = repository.findAllTraitValues(1L,1L,null);
+		assertNotNull("nothing returned",traits);
+		assertEquals(334, traits.size());
+	}
+	
+	@Test
+	public void testFindAllTraitValuesByStatisticType() {
+		List<Trait> traits = repository.findAllTraitValues(1L,1L,2L);
+		assertNotNull("nothing returned",traits);
+		assertEquals(167, traits.size());
 	}
 	
 	public static Trait createTraitWithAllDependencies() {

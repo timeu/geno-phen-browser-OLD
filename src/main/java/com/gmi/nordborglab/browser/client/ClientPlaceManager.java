@@ -1,6 +1,8 @@
 package com.gmi.nordborglab.browser.client;
 
 
+import at.gmi.nordborglab.widgets.geochart.client.GeoChart;
+
 import com.gmi.nordborglab.browser.client.gin.DefaultPlace;
 import com.gmi.nordborglab.browser.shared.proxy.AppDataProxy;
 import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
@@ -41,7 +43,7 @@ public class ClientPlaceManager extends PlaceManagerImpl {
 			public void run() {
 				
 			}
-		}, CoreChart.PACKAGE, MotionChart.PACKAGE);
+		}, CoreChart.PACKAGE, MotionChart.PACKAGE,GeoChart.PACKAGE);
 		
 		if (currentUser.getAppData() == null) {
 			rf.helperRequest().getAppData().fire(new Receiver<AppDataProxy>() {

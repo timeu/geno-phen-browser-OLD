@@ -10,4 +10,5 @@ public interface CustomRequestFactory extends RequestFactory{
 	ObsUnitRequest obsUnitRequest();
 	CdvRequest cdvRequest();
 	PermissionRequest permissionRequest();
+	TraitRequest traitRequest();
 }

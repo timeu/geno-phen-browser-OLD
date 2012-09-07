@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -27,13 +28,31 @@ import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyWizardVi
 import com.gmi.nordborglab.browser.shared.proxy.AlleleAssayProxy;
 import com.gmi.nordborglab.browser.shared.proxy.ObsUnitProxy;
 import com.gmi.nordborglab.browser.shared.proxy.PhenotypeProxy;
+import com.gmi.nordborglab.browser.shared.proxy.StatisticTypeProxy;
 import com.gmi.nordborglab.browser.shared.proxy.StudyProtocolProxy;
 import com.gmi.nordborglab.browser.shared.proxy.StudyProxy;
+import com.gmi.nordborglab.browser.shared.proxy.TraitProxy;
 import com.gmi.nordborglab.browser.shared.service.CdvRequest;
+import com.google.common.base.Predicate;
+import com.google.common.collect.BoundType;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.SortedMultiset;
+import com.google.common.collect.TreeMultiset;
+import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.requestfactory.gwt.ui.client.EntityProxyKeyProvider;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.gwtplatform.mvp.client.HasUiHandlers;
 import com.gwtplatform.mvp.client.Presenter;
@@ -51,11 +70,48 @@ import com.gwtplatform.mvp.client.proxy.TabContentProxyPlace;
 
 public class StudyWizardPresenter extends
 		Presenter<StudyWizardPresenter.MyView, StudyWizardPresenter.MyProxy> implements StudyWizardUiHandlers{
+	
+	static class StatisticTypePredicate implements Predicate<TraitProxy> {
+		
+		private final StatisticTypeProxy typeToFilter;
+		
+		public StatisticTypePredicate(StatisticTypeProxy typeToFilter) {
+			this.typeToFilter = typeToFilter;
+		}
+
+		@Override
+		public boolean apply(@Nullable TraitProxy input) {
+			if (typeToFilter == null)
+				return true;
+			if (input.getStatisticType() == null)
+				return false;
+			return typeToFilter.getId().equals(input.getStatisticType().getId());
+		}
+		
+	}
+	
+	static class ObsUnitNamePredicate implements Predicate<TraitProxy> {
+		private final String nameToFilter;
+		
+		public ObsUnitNamePredicate(String nameToFilter) {
+			this.nameToFilter =  nameToFilter;
+		}
+
+		@Override
+		public boolean apply(@Nullable TraitProxy input) {
+			if (nameToFilter == null)
+				return true;
+			if (input == null || input.getObsUnit() == null)
+				return false;
+			return false;
+		}
+	}
+	
 
 	public interface MyView extends View,HasUiHandlers<StudyWizardUiHandlers> {
 
 		StudyCreateDriver getStudyCreateDriver();
-		void setAcceptableValues(List<StudyProtocolProxy> studyProtocolValues,List<AlleleAssayProxy> alleleAssayValues);
+		void setAcceptableValues(List<StudyProtocolProxy> studyProtocolValues,List<AlleleAssayProxy> alleleAssayValues, List<StatisticTypeProxy> statisticTypeValues);
 		void setPreviousStep();
 		void setNextStep();
 		void showAccessionGenotypeOverlapChart(int numberOfObsUnitsWithGenotype,int numberOfObsUnitsWithoutGenotype);
@@ -63,7 +119,15 @@ public class StudyWizardPresenter extends
 		void scheduledLayout();
 		void showMissingGenotypes(List<ObsUnitProxy> missingGenotypes);
 		HasData<ObsUnitProxy> getMissingGenotypesDisplay();
+		HasData<TraitProxy> getPhenotypesDisplay();
 		void resetMissingGenotypesDataGrid();
+		void resetPhenotypeDataGrid();
+		void showBlankColumnChart();
+		void showPhenotypeHistogramChart(
+				ImmutableSortedMap<Double, Integer> histogram);
+		void showBlankGeoChart();
+		void showGeoChart(Multiset<String> geochartData);
+		TakesValue<StatisticTypeProxy> getStatisticTypeListBox();
 	}
 
 	@ProxyCodeSplit
@@ -81,6 +145,12 @@ public class StudyWizardPresenter extends
 	    return tabData;
 	 }
 	
+	public enum STATE {
+		GENOTYPE,PHENOTYPE;
+	}
+	
+	private STATE state  = STATE.GENOTYPE;
+	
 	private StudyProxy study;
 	protected PhenotypeProxy phenotype;
 	protected Long phenotypeId;
@@ -93,6 +163,12 @@ public class StudyWizardPresenter extends
 	private final Validator validator;
 	private Map<Long,List<ObsUnitProxy>> studyStats  = new HashMap<Long, List<ObsUnitProxy>>();
 	private ListDataProvider<ObsUnitProxy> missingGenotypesDataProvider = new ListDataProvider<ObsUnitProxy>();
+	private ListDataProvider<TraitProxy> phenotypesDataProvider = new ListDataProvider<TraitProxy>();
+	private MultiSelectionModel<TraitProxy> phenotypeSelectionModel = new MultiSelectionModel<TraitProxy>(new EntityProxyKeyProvider<TraitProxy>());
+	private SortedMultiset<Double> histogramData =  TreeMultiset.create();
+	private Multiset<String> geochartData;
+	private static int BIN_COUNT = 20;
+	private ImmutableList<TraitProxy> phenotypeValues = null;
 
 	@Inject
 	public StudyWizardPresenter(final EventBus eventBus, final MyView view,
@@ -108,7 +184,18 @@ public class StudyWizardPresenter extends
 		this.currentUser = currentUser;
 		this.phenotypeManager = phenotypeManager;
 		this.placeManager = placeManager;
-		getView().setAcceptableValues(currentUser.getAppData().getStudyProtocolList(),currentUser.getAppData().getAlleleAssayList());
+		getView().setAcceptableValues(currentUser.getAppData().getStudyProtocolList(),currentUser.getAppData().getAlleleAssayList(),currentUser.getAppData().getStatisticTypeList().subList(1,currentUser.getAppData().getStatisticTypeList().size()));
+		getView().getPhenotypesDisplay().setSelectionModel(phenotypeSelectionModel);
+		phenotypeSelectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+			
+			@Override
+			public void onSelectionChange(SelectionChangeEvent event) {
+				
+				showGeoChartData();
+				calculatePhenotypeHistogram();
+				showPhenotypeHistogram();
+			}
+		});
 	}
 
 	@Override
@@ -135,6 +222,7 @@ public class StudyWizardPresenter extends
 		super.onBind();
 		missingGenotypesDataProvider.addDataDisplay(getView().getMissingGenotypesDisplay());
 		getView().resetMissingGenotypesDataGrid();
+		phenotypesDataProvider.addDataDisplay(getView().getPhenotypesDisplay());
 	}
 	
 	@Override
@@ -206,15 +294,38 @@ public class StudyWizardPresenter extends
 
 	@Override
 	public void onNext() {
-		getView().getStudyCreateDriver().flush();
-	    @SuppressWarnings("unchecked")
-		Set<ConstraintViolation<?>> violations = ( Set<ConstraintViolation<?>>)(Set)validator.validate(study,Default.class);
-	    if (!violations.isEmpty()) {
-	    	getView().getStudyCreateDriver().setConstraintViolations(violations);
-	    }
-	    else {
-	    	getView().setNextStep();
-	    }
+		switch (state) {
+			case GENOTYPE:
+				getView().getStudyCreateDriver().flush();
+			    @SuppressWarnings("unchecked")
+				Set<ConstraintViolation<?>> violations = ( Set<ConstraintViolation<?>>)(Set)validator.validate(study,Default.class);
+			    if (!violations.isEmpty()) {
+			    	getView().getStudyCreateDriver().setConstraintViolations(violations);
+			    }
+			    else {
+			    	getView().setNextStep();
+			    	if (phenotypeSelectionModel.getSelectedSet().size() == 0) {
+			    		getView().showBlankColumnChart();
+			    		getView().showBlankGeoChart();
+			    	}
+			    	if (phenotypeValues == null) {
+			    		getView().resetPhenotypeDataGrid();
+						phenotypeManager.findAllTraitValues(new Receiver<List<TraitProxy>>() {
+
+							@Override
+							public void onSuccess(List<TraitProxy> response) {
+								phenotypeValues = ImmutableList.copyOf(response);
+								filterAndShowPhenotypeValues(null);
+							}
+							
+						},phenotype.getId(),study.getAlleleAssay().getId(),null);
+					}
+			    }
+			    break;
+			case PHENOTYPE:
+				String test="test";
+				break;
+		}
 	}
 
 	@Override
@@ -250,5 +361,97 @@ public class StudyWizardPresenter extends
 				}, phenotypeId, value.getId());
 			}
 		}
+	}
+
+	
+
+	@Override
+	public void selectAllPhenotypeValues(Boolean value) {
+		for (TraitProxy trait:phenotypesDataProvider.getList()) {
+			phenotypeSelectionModel.setSelected(trait, value);
+		}
+		if (!value) {
+			histogramData.clear();
+			getView().showBlankColumnChart();
+			getView().showBlankGeoChart();
+		}
+		else {
+			calculatePhenotypeHistogram();
+			showPhenotypeHistogram();
+			showGeoChartData();
+		}
+	}
+	
+	private void showPhenotypeHistogram() {
+		if (histogramData.size() == 0)
+			return;
+		Double min = histogramData.elementSet().first();
+		Double max = histogramData.elementSet().last();
+		if (min == max)
+			return;
+		Double binWidth = (max - min)/BIN_COUNT;
+		ImmutableSortedMap.Builder<Double, Integer>  builder = ImmutableSortedMap.naturalOrder();
+		for (int i =0;i<BIN_COUNT;i++) {
+			Double lowBound = min+i*binWidth;
+			Double upperBound = lowBound + binWidth;
+			builder.put(lowBound,histogramData.subMultiset(lowBound, BoundType.CLOSED, upperBound, BoundType.CLOSED).size());
+		}
+		builder.put(max,0);
+		ImmutableSortedMap<Double, Integer> histogram = builder.build();
+		getView().showPhenotypeHistogramChart(histogram);
+	}
+	
+	private void calculatePhenotypeHistogram() {
+		histogramData.clear();
+		for (TraitProxy trait: phenotypeSelectionModel.getSelectedSet()) {
+			if (trait.getValue() != null) {
+				try {
+					histogramData.add(Double.parseDouble(trait.getValue()));
+				}catch (NumberFormatException e) {}
+			}
+		}
+	}
+	
+	private void showGeoChartData() {
+		ImmutableMultiset.Builder<String> builder =   ImmutableMultiset.builder();
+		for (TraitProxy trait: phenotypeSelectionModel.getSelectedSet()) {
+			try  {
+				String cty = trait.getObsUnit().getStock().getPassport().getCollection().getLocality().getOrigcty();
+				builder.add(cty);
+			}
+			catch (NullPointerException e) {
+				
+			}
+		}
+		geochartData = builder.build();
+		getView().showGeoChart(geochartData);
+	}
+	
+	private void filterAndShowPhenotypeValues(StatisticTypeProxy type) {
+		if (phenotypeValues == null || phenotypeValues.size() == 0)
+			return;
+		if (type == null) {
+			type = phenotypeValues.get(0).getStatisticType();
+		}
+		getView().getStatisticTypeListBox().setValue(type);
+		phenotypesDataProvider.setList(Lists.newArrayList(Collections2.filter(phenotypeValues, new StatisticTypePredicate(type))));
+	}
+
+	@Override
+	public void onStatisticTypeChanged(StatisticTypeProxy type) {
+		filterAndShowPhenotypeValues(type);
+	}
+
+	@Override
+	public void onSearchName(final String query) {
+		phenotypesDataProvider.setList(Lists.newArrayList(Collections2.filter(phenotypesDataProvider.getList(), new Predicate<TraitProxy>() {
+
+			@Override
+			public boolean apply(@Nullable TraitProxy input) {
+				return (query == null || query.length() == 0 || input.getObsUnit().getName().indexOf(query)>0);
+			}
+			
+		})));
+		
 	}
 }

@@ -44,31 +44,24 @@
 		<div >
 			<div class="{style.title}">STUDY INFO</div>
 			<div class="{style.row}">
-				<gui:ValidationValueBoxEditorDecorator ui:field="name" label="name">
+				<gui:ValidationValueBoxEditorDecorator ui:field="name" label="Name">
 					<gui:valuebox>
 						<g:TextBox visibleLength="20"/>
 					</gui:valuebox>
 				</gui:ValidationValueBoxEditorDecorator>
 			</div>
 			<div class="{style.row}">
-				<div class="{style.label}">Producer</div>
-				<e:ValueBoxEditorDecorator ui:field="producer" addStyleNames="{style.value}">
-				<e:valuebox>
+				<gui:ValidationValueBoxEditorDecorator ui:field="producer" label="Producer" helpLabel="Optional">
+				   <gui:valuebox>
 						<g:TextBox visibleLength="60"/>
-					</e:valuebox>
-				</e:ValueBoxEditorDecorator>
+					</gui:valuebox>
+				</gui:ValidationValueBoxEditorDecorator>
 			</div>
 			<div class="{style.row}">
-				<div class="{style.label}">Protocol</div>
-				<div class="{style.value}">
-					<g:ValueListBox ui:field="protocol"  />
-				</div>		
+				<gui:ValidationValueListEditorDecorator ui:field="protocol" label="Protocol" />
 			</div>
 			<div class="{style.row}">
-				<div class="{style.label}">Genotype</div>
-				<div class="{style.value}">
-					<g:ValueListBox ui:field="genotype"/>
-				</div>
+				<gui:ValidationValueListEditorDecorator ui:field="genotype" label="Genotype" />
 			</div>
 		</div>
 	</g:HTMLPanel>

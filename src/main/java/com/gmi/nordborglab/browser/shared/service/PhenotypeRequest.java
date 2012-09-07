@@ -15,4 +15,5 @@ public interface PhenotypeRequest extends RequestContext{
 	Request<PhenotypeProxy> findPhenotype(Long id);
 
 	Request<PhenotypeProxy> save(PhenotypeProxy phenotype);
+
 }

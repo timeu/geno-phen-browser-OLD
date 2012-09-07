@@ -2,6 +2,7 @@ package com.gmi.nordborglab.browser.client.ui;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.LabelElement;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.resources.client.CssResource;
@@ -23,10 +24,11 @@ public abstract class ValidationDecorator extends Composite {
 	
 	interface MyStyle extends CssResource {
 		String errorBox();
+		String errorIcon();
 	}
 	
 	@UiField DivElement warnIcon;
-	@UiField DivElement errorIcon;
+	//@UiField ImageElement errorIcon;
 	@UiField DivElement helpLabel;
 	@UiField DivElement errorLabel;
 	@UiField SimplePanel contents;
@@ -51,6 +53,7 @@ public abstract class ValidationDecorator extends Composite {
 			display = Display.BLOCK;
 		}
 		helpLabel.getStyle().setDisplay(display);
+		helpLabel.setInnerText(label);
 	}
 	
 	public void setError(String error) {
@@ -58,14 +61,21 @@ public abstract class ValidationDecorator extends Composite {
 		if (error!=null &&  !error.equals("")) {
 			display = Display.BLOCK;
 			contents.getWidget().addStyleName(style.errorBox());
+			contents.addStyleName(style.errorIcon());
 		}
 		else {
 			contents.getWidget().removeStyleName(style.errorBox());
+			contents.removeStyleName(style.errorIcon());
 		}
 		errorLabel.getStyle().setDisplay(display);
 		errorLabel.setInnerText(error);
-		errorIcon.getStyle().setDisplay(display);
+		//errorIcon.getStyle().setDisplay(display);
 		warnIcon.getStyle().setDisplay(display);
+	}
+	
+	
+	public void setLabel(String text) {
+		label.setInnerText(text);
 	}
 
 }

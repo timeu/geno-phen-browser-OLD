@@ -24,7 +24,6 @@ public interface StudyProxy extends EntityProxy {
 	public void setAlleleAssay(AlleleAssayProxy alleleAssay);
 	
 	@NotNull
-	@Size(min=5)
 	public String getName();
 	public void setName(String name);
 	
