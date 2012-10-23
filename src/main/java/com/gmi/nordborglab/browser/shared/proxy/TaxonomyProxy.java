@@ -1,5 +1,7 @@
 package com.gmi.nordborglab.browser.shared.proxy;
 
+import java.util.List;
+
 import com.gmi.nordborglab.browser.server.domain.germplasm.Taxonomy;
 import com.gmi.nordborglab.browser.server.service.SpringEntitiyLocator;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
@@ -33,4 +35,6 @@ public interface TaxonomyProxy extends EntityProxy {
 	
 	public String getTermAccession();
 	public void setTermAccession(String termAccession);
+	
+	public List<AlleleAssayProxy> getAlleleAssays();
 }

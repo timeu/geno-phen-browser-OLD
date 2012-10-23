@@ -21,6 +21,17 @@ public interface MainResources extends ClientBundle{
 		String button_blue();
 		String button_red();
 		String cursor();
+		String piechart();
+		String earth();
+		String columnchart();
+		String motionchart();
+		String chartActionRow();
+		String chartIconContainer();
+		String iconContainer();
+		String iconItem();
+		String iconContainer_right();
+		String iconContainer_active();
+		String plant_icon();
 	}
 
 	@Source("images/transplant_logo_small.png")
@@ -47,6 +58,27 @@ public interface MainResources extends ClientBundle{
 	
 	@Source("images/profile.png")
 	ImageResource profile();
+	
+	@Source("images/piechart.jpg")
+	ImageResource piechart();
+	
+	@Source("images/earth.png")
+	ImageResource earth();
+	
+	@Source("images/motionchart.png")
+	ImageResource motionchart();
+	
+	@Source("images/columnchart.png")
+	ImageResource columnchart();
+	
+	@Source("images/plant1.png")
+	ImageResource plant1();
+	
+	@Source("images/plant2.png")
+	ImageResource plant2();
+	
+	@Source("images/plant3.png")
+	ImageResource plant3();
 	
 	@Source("style.css")
 	MainStyle style();

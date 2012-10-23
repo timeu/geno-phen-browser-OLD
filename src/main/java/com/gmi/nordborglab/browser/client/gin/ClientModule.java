@@ -32,6 +32,12 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.Stud
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyGWASPlotPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyWizardPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.GermplasmPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportListPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyOverviewPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.home.HomePresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.home.dashboard.DashboardPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.main.MainPagePresenter;
@@ -52,6 +58,7 @@ import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyDetailVi
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyGWASPlotView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyTabView;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.study.StudyWizardView;
+import com.gmi.nordborglab.browser.client.mvp.view.germplasm.GermplasmView;
 import com.gmi.nordborglab.browser.client.mvp.view.home.HomeView;
 import com.gmi.nordborglab.browser.client.mvp.view.home.dashboard.DashboardView;
 import com.gmi.nordborglab.browser.client.mvp.view.main.MainPageView;
@@ -64,7 +71,6 @@ import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
 import com.gmi.nordborglab.browser.shared.service.HelperFactory;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.storage.client.Storage;
-import com.google.gwt.validation.client.impl.AbstractGwtValidator;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
@@ -77,7 +83,10 @@ import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalytics;
 import com.gwtplatform.mvp.client.googleanalytics.GoogleAnalyticsImpl;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.TokenFormatter;
-import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyWizardPresenter;
+import com.gmi.nordborglab.browser.client.mvp.view.germplasm.taxonomy.TaxonomyOverviewView;
+import com.gmi.nordborglab.browser.client.mvp.view.germplasm.taxonomy.TaxonomyDetailView;
+import com.gmi.nordborglab.browser.client.mvp.view.germplasm.passport.PassportListView;
+import com.gmi.nordborglab.browser.client.mvp.view.germplasm.passport.PassportDetailView;
 
 public class ClientModule extends AbstractPresenterModule {
 
@@ -194,6 +203,27 @@ public class ClientModule extends AbstractPresenterModule {
 		bindPresenter(StudyWizardPresenter.class,
 				StudyWizardPresenter.MyView.class, StudyWizardView.class,
 				StudyWizardPresenter.MyProxy.class);
+
+		bindPresenter(GermplasmPresenter.class,
+				GermplasmPresenter.MyView.class, GermplasmView.class,
+				GermplasmPresenter.MyProxy.class);
+
+		bindPresenter(TaxonomyOverviewPresenter.class,
+				TaxonomyOverviewPresenter.MyView.class,
+				TaxonomyOverviewView.class,
+				TaxonomyOverviewPresenter.MyProxy.class);
+
+		bindPresenter(TaxonomyDetailPresenter.class,
+				TaxonomyDetailPresenter.MyView.class, TaxonomyDetailView.class,
+				TaxonomyDetailPresenter.MyProxy.class);
+
+		bindPresenter(PassportListPresenter.class,
+				PassportListPresenter.MyView.class, PassportListView.class,
+				PassportListPresenter.MyProxy.class);
+
+		bindPresenter(PassportDetailPresenter.class,
+				PassportDetailPresenter.MyView.class, PassportDetailView.class,
+				PassportDetailPresenter.MyProxy.class);
 	}
 
 	@Provides

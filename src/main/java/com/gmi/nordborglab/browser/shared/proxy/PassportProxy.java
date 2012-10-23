@@ -26,8 +26,8 @@ public interface PassportProxy extends EntityProxy {
     public void setAccenumb(String accenumb);
     
     
-    public String getSampstat();
-    public void setSampstat(String sampstat);
+    public SampStatProxy getSampstat();
+    public void setSampstat(SampStatProxy sampstat);
     
     
     public String getComments();

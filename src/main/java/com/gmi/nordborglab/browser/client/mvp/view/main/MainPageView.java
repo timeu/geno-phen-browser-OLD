@@ -5,13 +5,16 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.main.MainPagePresenter.M
 import com.gmi.nordborglab.browser.client.resources.MainResources;
 import com.gmi.nordborglab.browser.client.ui.NotificationPopup;
 import com.gmi.nordborglab.browser.shared.proxy.AppUserProxy;
-import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Display;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHyperlink;
 import com.google.gwt.user.client.ui.Label;
@@ -19,6 +22,8 @@ import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 
@@ -32,7 +37,7 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	}
 	
 	@UiField SimpleLayoutPanel container;
-	@UiField AnchorElement userLink;
+	@UiField Anchor userLink;
 	@UiField HTMLPanel userInfoContainer;
 	@UiField Label userName;
 	@UiField Label userEmail;
@@ -44,14 +49,16 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	@UiField DivElement loadingIndicator;
 	//@UiField FlowPanel userInfoContainer;
 	protected final NotificationPopup notificationPopup = new NotificationPopup();
-	
+	private final PlaceManager placeManager;
 	private final MainResources resources;
+	private AppUserProxy user;
 
 	@Inject
-	public MainPageView(final Binder binder,final MainResources resources) {
+	public MainPageView(final Binder binder,final MainResources resources, final PlaceManager placeManager) {
 		widget = binder.createAndBindUi(this);
 		this.resources = resources;
 		loadingIndicator.getStyle().setDisplay(Display.NONE);
+		this.placeManager = placeManager; 
 	}
 
 	@Override
@@ -95,14 +102,15 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 
 	@Override
 	public void showUserInfo(AppUserProxy user) {
+		this.user = user;
 		if (user == null) {
-			userLink.setHref("login");
-			userLink.setInnerText("Log In");
+			userLink.setHref(null);
+			userLink.setText("Log In");
 			userInfoContainer.setVisible(false);
 		}
 		else {
 			userLink.setHref(null);
-			userLink.setInnerHTML("My Account<span class=\""+resources.style().arrow_down()+"\" />");
+			userLink.setHTML("My Account<span class=\""+resources.style().arrow_down()+"\" />");
 			userInfoContainer.setVisible(true);
 			userEmail.setText(user.getEmail());
 			userName.setText(user.getFirstname() + " " + user.getLastname());
@@ -149,6 +157,14 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 		//text = text + "test";
 		loadingIndicator.setInnerText(text);
 		loadingIndicator.getStyle().setDisplay(show ? Display.BLOCK : Display.NONE);
+	}
+	
+	@UiHandler("userLink")
+	public void onLogin(ClickEvent e) {
+		if (user == null) {
+			PlaceRequest request = placeManager.getCurrentPlaceRequest();
+			Window.Location.assign("login?url=" +placeManager.buildHistoryToken(request));
+		}
 	}
 	
 }

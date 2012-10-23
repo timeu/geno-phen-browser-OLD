@@ -10,9 +10,12 @@
 		<link rel="stylesheet" href="<c:url value='/css/login.css'/>" />
 		<link rel="stylesheet" href="<c:url value='/css/openid-shadow.css'/>" />
 		<link rel="stylesheet" href="<c:url value='/css/960_12_col.css'/>" />
+		<link rel="stylesheet" href="<c:url value='/css/m-styles.min.css'/>" /> 
+		
     	<script type="text/javascript" src="<c:url value='/js/jquery-1.2.6.min.js'/>"></script>
 		<script type="text/javascript" src="<c:url value='/js/openid-jquery.js'/>"></script>
 		<script type="text/javascript" src="<c:url value='/js/openid-en.js' />"></script>
+		<script type="text/javascript" src="<c:url value='/js/m-radio.min.js' />"></script>
 		<script type="text/javascript">
 		    $(document).ready(function() {
 		        openid.init('openid_identifier');
@@ -37,7 +40,7 @@
 				<div class="form_login_info">
 				   Sign in with your local account:
 				</div>
-				<form class="login-form" action="j_spring_security_check" method="post" >
+				<form class="login-form" action="j_spring_security_check?spring-security-redirect=/${url}" method="post" >
 				<input id="j_username" name="j_username" size="20" maxlength="50" type="text" placeHolder="name@example.com"/>
 				<input id="j_password" name="j_password" size="20" maxlength="50" type="password" placeHolder="Password"/>
 				<input type="submit" value="Login"/></p>
@@ -45,7 +48,7 @@
 		</div>
 		<div class="form_login">
 	<!-- Simple OpenID Selector -->
-			<form action="<c:url value='j_spring_openid_security_check'/>" method="post" id="openid_form">
+			<form action="<c:url value='j_spring_openid_security_check?spring-security-redirect=/${url}'/>" method="post" id="openid_form">
 	    		<input type="hidden" name="action" value="verify" />
 	            <div id="openid_choice">
 	                <div class="form_login_info">Or, do you already have an account on one of these sites? Click the logo to log in with it here:</div>

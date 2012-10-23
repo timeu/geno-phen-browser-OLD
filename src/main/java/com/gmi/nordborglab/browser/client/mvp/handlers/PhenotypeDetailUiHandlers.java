@@ -11,4 +11,6 @@ public interface PhenotypeDetailUiHandlers extends UiHandlers{
 	public void onCancel();
 
 	public void onDelete();
+
+	public void onSelectPhenotypeType(Integer type);
 }

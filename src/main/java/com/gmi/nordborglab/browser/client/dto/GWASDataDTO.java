@@ -3,8 +3,7 @@ package com.gmi.nordborglab.browser.client.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsonUtils;
+import com.gmi.nordborglab.browser.client.util.DataTableUtils;
 import com.google.gwt.visualization.client.DataTable;
 
 public class GWASDataDTO {
@@ -23,13 +22,7 @@ public class GWASDataDTO {
 		}
 		
 		for (int i =0;i<data.getGWASDataTablesJSON().length();i++) {
-			JavaScriptObject gwasData = JsonUtils.safeEval(data.getGWASDataTablesJSON().get(i));
-			DataTable dataTable = DataTable.create(gwasData);
-			/*dataTable.insertRows(0,1);
-			dataTable.setValue(0, 0, 0);
-			int index = dataTable.addRow();
-			dataTable.setValue(index, 0, chrLengths.get(i));*/
-			gwasDataTables.add(dataTable);
+			gwasDataTables.add(DataTableUtils.createDataTableFromString(data.getGWASDataTablesJSON().get(i)));
 		}
 	}
 

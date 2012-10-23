@@ -27,11 +27,16 @@ public class PhenotypeManager extends RequestFactoryManager<PhenotypeRequest> {
 	}
 
 	public void findOne(Receiver<PhenotypeProxy> receiver, Long id) {
-		rf.phenotypeRequest().findPhenotype(id).with("unitOfMeasure","userPermission").fire(receiver);
+		rf.phenotypeRequest().findPhenotype(id).with("statisticTypes","unitOfMeasure","userPermission").fire(receiver);
 	}
 	
 	public void findAllTraitValues(Receiver<List<TraitProxy>> receiver,Long phenotypeId,Long alleleAssayId ,Long statisticTypeId) {
 		rf.traitRequest().findAllTraitValues(phenotypeId, alleleAssayId, statisticTypeId).with("obsUnit.stock.passport.collection.locality","statisticType").fire(receiver);
+	}
+
+	public void findAllTraitValuesByType(Long phenotypeId,Long statisticTypeId,
+			Receiver<List<TraitProxy>> receiver) {
+		rf.traitRequest().findAllTraitValuesByStatisticType(phenotypeId,statisticTypeId).with("obsUnit.stock.passport.collection.locality").fire(receiver);
 	}
 
 }

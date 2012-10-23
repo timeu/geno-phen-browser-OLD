@@ -3,7 +3,9 @@ package com.gmi.nordborglab.browser.server.domain.cdv;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.CascadeType;
@@ -16,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import com.gmi.nordborglab.browser.server.domain.BaseEntity;
 import com.gmi.nordborglab.browser.server.domain.genotype.AlleleAssay;
@@ -29,7 +32,7 @@ import com.gmi.nordborglab.browser.server.security.CustomAccessControlEntry;
 public class Study extends BaseEntity {
 
 	@ManyToMany(fetch = FetchType.LAZY,cascade={CascadeType.PERSIST,CascadeType.MERGE},mappedBy="studies")
-	private List<Trait> traits  = new ArrayList<Trait>();
+	private Set<Trait> traits  = new HashSet<Trait>();
 	
 	@ManyToOne(cascade={CascadeType.PERSIST,CascadeType.MERGE})
 	@JoinColumn(name="cdv_g2p_protocol_id")
@@ -42,7 +45,8 @@ public class Study extends BaseEntity {
 	private String name;
 	private String producer;
 	private Date study_date;
-	private Boolean isdone;
+	@NotNull
+	private Boolean isdone=false;
 	
 	@Transient
 	private CustomAccessControlEntry userPermission = new CustomAccessControlEntry(0L, 0, true);
@@ -52,8 +56,8 @@ public class Study extends BaseEntity {
 	
 	
 	
-	public List<Trait> getTraits() {
-		return Collections.unmodifiableList(traits);
+	public Set<Trait> getTraits() {
+		return Collections.unmodifiableSet(traits);
 	}
 	
 
@@ -108,8 +112,8 @@ public class Study extends BaseEntity {
 		alleleAssay.addStudy(this);
 	}
 	
-	public void addTraits(List<Trait> traits) {
-		this.traits.addAll(traits.size(), traits);
+	public void addTraits(Set<Trait> traits) {
+		this.traits.addAll(traits);
 		for (Trait trait: traits) {
 			trait.addStudy(this);
 		}
@@ -117,6 +121,13 @@ public class Study extends BaseEntity {
 	public void addTrait(Trait trait) {
 		traits.add(trait);
 		trait.addStudy(this);
+	}
+	
+	public void setTraits(Set<Trait> traits) {
+		for (Trait trait: traits) {
+			trait.addStudy(this);
+		}
+		this.traits = traits;
 	}
 	
 	public CustomAccessControlEntry getUserPermission() {

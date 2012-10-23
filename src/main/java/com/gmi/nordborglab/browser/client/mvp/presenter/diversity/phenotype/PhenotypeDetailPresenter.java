@@ -1,8 +1,8 @@
 package com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -13,7 +13,6 @@ import com.gmi.nordborglab.browser.client.NameTokens;
 import com.gmi.nordborglab.browser.client.ParameterizedPlaceRequest;
 import com.gmi.nordborglab.browser.client.TabDataDynamic;
 import com.gmi.nordborglab.browser.client.events.DisplayNotificationEvent;
-import com.gmi.nordborglab.browser.client.events.LoadExperimentEvent;
 import com.gmi.nordborglab.browser.client.events.LoadPhenotypeEvent;
 import com.gmi.nordborglab.browser.client.events.LoadingIndicatorEvent;
 import com.gmi.nordborglab.browser.client.manager.PhenotypeManager;
@@ -21,12 +20,19 @@ import com.gmi.nordborglab.browser.client.mvp.handlers.PhenotypeDetailUiHandlers
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentDetailPresenter.State;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.phenotype.PhenotypeDetailView.PhenotypeDisplayDriver;
 import com.gmi.nordborglab.browser.client.mvp.view.diversity.phenotype.PhenotypeDetailView.PhenotypeEditDriver;
-import com.gmi.nordborglab.browser.shared.proxy.ExperimentProxy;
 import com.gmi.nordborglab.browser.shared.proxy.PhenotypeProxy;
+import com.gmi.nordborglab.browser.shared.proxy.StatisticTypeProxy;
+import com.gmi.nordborglab.browser.shared.proxy.TraitProxy;
 import com.gmi.nordborglab.browser.shared.proxy.UnitOfMeasureProxy;
-import com.gmi.nordborglab.browser.shared.service.ExperimentRequest;
 import com.gmi.nordborglab.browser.shared.service.PhenotypeRequest;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.SortedMultiset;
+import com.google.common.collect.TreeMultiset;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.requestfactory.shared.Receiver;
@@ -61,13 +67,33 @@ public class PhenotypeDetailPresenter
 
 		void setAcceptableValuesForUnitOfMeasure(
 				Collection<UnitOfMeasureProxy> values);
+
+		void setGeoChartData(Multiset<String> geochartData);
+
+		void setHistogramChartData(
+				ImmutableSortedMap<Double, Integer> histogramData);
+
+		void scheduledLayout();
+
+		void setPhenotypExplorerData(ImmutableList<TraitProxy> traits);
+
+		void setPhenotypePieChartData(Set<StatisticTypeProxy> statisticTypes);
+
+		void drawCharts();
 	}
+	
+	
 	protected PhenotypeProxy phenotype;
 	protected boolean fireLoadEvent;
 	protected final PlaceManager placeManager; 
 	protected final PhenotypeManager phenotypeManager;
 	protected final CurrentUser currentUser;
 	protected final Receiver<PhenotypeProxy> receiver;
+	private ImmutableSortedMap<Double, Integer> histogramData;
+	protected HashMap<StatisticTypeProxy, List<TraitProxy>> cache = new HashMap<StatisticTypeProxy, List<TraitProxy>>();
+			
+	private Multiset<String> geochartData;
+	private static int BIN_COUNT = 20;
 	
 	@ProxyCodeSplit
 	@NameToken(NameTokens.phenotype)
@@ -129,6 +155,11 @@ public class PhenotypeDetailPresenter
 		getView().setState(State.DISPLAYING,currentUser.getPermissionMask(phenotype.getUserPermission()));
 		getProxy().getTab().setTargetHistoryToken(placeManager.buildHistoryToken(placeManager.getCurrentPlaceRequest()));
 		LoadingIndicatorEvent.fire(this, false);
+		getView().setPhenotypePieChartData(phenotype.getStatisticTypes());
+		getView().setGeoChartData(null);
+		getView().setHistogramChartData(null);
+		getView().setPhenotypExplorerData(null);
+		getView().scheduledLayout();
 	}
 	
 	
@@ -146,6 +177,7 @@ public class PhenotypeDetailPresenter
 
 			@Override
 			public void onFailure(ServerFailure error) {
+				fireEvent(new LoadingIndicatorEvent(false));
 				getProxy().manualRevealFailed();
 				placeManager.revealPlace(new PlaceRequest(NameTokens.experiments));
 			}
@@ -154,6 +186,7 @@ public class PhenotypeDetailPresenter
 			Long phenotypeId = Long.valueOf(placeRequest.getParameter("id",
 					null));
 			if (phenotype == null || !phenotype.getId().equals(phenotypeId)) {
+				cache.clear();
 				phenotypeManager.findOne(receiver, phenotypeId);
 			} else {
 				getProxy().manualReveal(PhenotypeDetailPresenter.this);
@@ -199,7 +232,10 @@ public class PhenotypeDetailPresenter
 	}
 	
 	@ProxyEvent
-	public void onLoadExperiment(LoadPhenotypeEvent event) {
+	public void onLoadPhenotype(LoadPhenotypeEvent event) {
+		if (phenotype != event.getPhenotype()) {
+			cache.clear();
+		}
 		phenotype = event.getPhenotype();
 		PlaceRequest request = new ParameterizedPlaceRequest(getProxy().getNameToken()).with("id",phenotype.getId().toString());
 		String historyToken  = placeManager.buildHistoryToken(request);
@@ -214,5 +250,88 @@ public class PhenotypeDetailPresenter
 		return permission;
 	}
 	
+	private void calculateHistogramData(List<TraitProxy> traits) {
+		SortedMultiset<Double> data = TreeMultiset.create();
+		for (TraitProxy trait : traits) {
+			if (trait.getValue() != null) {
+				try {
+					data.add(Double.parseDouble(trait.getValue()));
+				} catch (NumberFormatException e) {
+				}
+			}
+		}
+		if (data.size() == 0)
+			return;
+		Double min = data.elementSet().first();
+		Double max = data.elementSet().last();
+		if (min == max)
+			return;
+		Double binWidth = (max - min) / BIN_COUNT;
+		ImmutableSortedMap.Builder<Double, Integer> builder = ImmutableSortedMap
+				.naturalOrder();
+		for (int i = 0; i < BIN_COUNT; i++) {
+			Double lowBound = min + i * binWidth;
+			Double upperBound = lowBound + binWidth;
+			builder.put(
+					lowBound,
+					data.subMultiset(lowBound, BoundType.CLOSED,
+							upperBound, BoundType.CLOSED).size());
+		}
+		builder.put(max, 0);
+		histogramData = builder.build();
+	}
+
+	private void calculateGeoChartData(List<TraitProxy> traits) {
+		ImmutableMultiset.Builder<String> builder = ImmutableMultiset.builder();
+		for (TraitProxy trait : traits) {
+			try {
+				String cty = trait.getObsUnit().getStock().getPassport()
+						.getCollection().getLocality().getCountry();
+				builder.add(cty);
+			} catch (NullPointerException e) {
+
+			}
+		}
+		geochartData = builder.build();
+	}
+
+	@Override
+	public void onSelectPhenotypeType(Integer index) {
+		if (index == null) {
+			getView().setGeoChartData(null);
+			getView().setHistogramChartData(null);
+			getView().setPhenotypExplorerData(null);
+			getView().drawCharts();
+		}
+		else {
+			final StatisticTypeProxy type = Iterables.get(phenotype.getStatisticTypes(),index);
+			List<TraitProxy> cachedTraits = cache.get(type);
+			if (cachedTraits != null) 
+			{
+				calculateChartDataAndDisplay(cachedTraits);
+			}
+			else{
+				fireEvent(new LoadingIndicatorEvent(true));
+				phenotypeManager.findAllTraitValuesByType(phenotype.getId(),type.getId(),new Receiver<List<TraitProxy>>() {
+	
+					@Override
+					public void onSuccess(List<TraitProxy> response) {
+						fireEvent(new LoadingIndicatorEvent(false));
+						cache.put(type, response);
+						calculateChartDataAndDisplay(response);
+					}
+				});
+			}
+	 	}
+	}
+	
+	private void calculateChartDataAndDisplay(List<TraitProxy> traits) {
+		calculateGeoChartData(traits);
+		calculateHistogramData(traits);
+		getView().setGeoChartData(geochartData);
+		getView().setHistogramChartData(histogramData);
+		getView().setPhenotypExplorerData(ImmutableList.copyOf(traits));
+		getView().drawCharts();
+	}
 	
 }

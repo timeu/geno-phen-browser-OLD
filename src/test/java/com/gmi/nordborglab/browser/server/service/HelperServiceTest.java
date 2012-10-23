@@ -15,10 +15,12 @@ import org.junit.Test;
 import com.gmi.nordborglab.browser.server.domain.AppData;
 import com.gmi.nordborglab.browser.server.domain.BreadcrumbItem;
 import com.gmi.nordborglab.browser.server.domain.cdv.Study;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Taxonomy;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.repository.ExperimentRepository;
 import com.gmi.nordborglab.browser.server.repository.StudyRepository;
+import com.gmi.nordborglab.browser.server.repository.TaxonomyRepository;
 import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 import com.gmi.nordborglab.browser.server.testutils.SecurityUtils;
@@ -30,6 +32,9 @@ public class HelperServiceTest extends BaseTest {
 	
 	@Resource
 	private ExperimentRepository experimentRepository;
+	
+	@Resource
+	private TaxonomyRepository taxonomyRepository;
 	
 	@Resource
 	private TraitUomRepository traitUomRepository;
@@ -136,6 +141,22 @@ public class HelperServiceTest extends BaseTest {
 		assertEquals(trait.getId(),studyItem.getId());
 		assertEquals("New Study",studyItem.getText());
 		assertEquals("studywizard",studyItem.getType());
+	}
+	
+	
+	@Test
+	public void testTaxonomyWizardBreadcrumbs() {
+		Taxonomy taxonomy = taxonomyRepository.findOne(1L);
+		List<BreadcrumbItem> breadcrumbs = service.getBreadcrumbs(1L, "taxonomy");
+		
+		
+		assertNotNull(breadcrumbs);
+		assertEquals(1, breadcrumbs.size());
+		BreadcrumbItem breadcrumbItem = breadcrumbs.get(0);
+		
+		assertEquals(taxonomy.getId(),breadcrumbItem.getId());
+		assertEquals(taxonomy.getGenus()+" "+taxonomy.getSpecies() ,breadcrumbItem.getText());
+		assertEquals("taxonomy",breadcrumbItem.getType());
 	}
 	
 	@Test

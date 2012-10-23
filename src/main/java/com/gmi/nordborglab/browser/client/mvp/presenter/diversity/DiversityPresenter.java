@@ -7,6 +7,7 @@ import com.gmi.nordborglab.browser.client.ParameterizedPlaceRequest;
 import com.gmi.nordborglab.browser.client.manager.HelperManager;
 import com.gmi.nordborglab.browser.client.mvp.presenter.main.MainPagePresenter;
 import com.gmi.nordborglab.browser.shared.proxy.BreadcrumbItemProxy;
+import com.gmi.nordborglab.browser.shared.proxy.TaxonomyProxy;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -23,6 +24,8 @@ import com.gwtplatform.mvp.client.proxy.RevealContentHandler;
 
 public class DiversityPresenter extends
 	Presenter<DiversityPresenter.MyView, DiversityPresenter.MyProxy> {
+
+	
 
 	public interface MyView extends View {
 		void clearBreadcrumbs(int size);
@@ -42,6 +45,7 @@ public class DiversityPresenter extends
 	private final HelperManager helperManager;
 	protected String titleType = null;
 	protected Long titleId = null;
+	protected List<TaxonomyProxy> taxonomies = null;
 
 	@Inject
 	public DiversityPresenter(final EventBus eventBus, final MyView view,
@@ -64,6 +68,9 @@ public class DiversityPresenter extends
 	@Override
 	protected void onReset() {
 		super.onReset();
+		if (taxonomies == null) {
+			
+		}
 		setTitle();
 	}
 	
@@ -136,5 +143,11 @@ public class DiversityPresenter extends
 		titleType = type;
 		titleId = id;
 		return required;
+	}
+	
+	
+	@Override
+	public boolean useManualReveal() {
+		return false;
 	}
 }

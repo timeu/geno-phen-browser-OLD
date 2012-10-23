@@ -101,6 +101,10 @@ public class MainPagePresenter extends
 			request.matchesNameToken(NameTokens.studygwas)
 			)
 			menu = MENU.DIVERSITY;
+		else if (request.matchesNameToken(NameTokens.taxonomies) ||
+				request.matchesNameToken(NameTokens.taxonomy)
+			)
+			menu = MENU.GERMPLASM;
 		return menu;
 	}
 	

@@ -11,4 +11,5 @@ public interface CustomRequestFactory extends RequestFactory{
 	CdvRequest cdvRequest();
 	PermissionRequest permissionRequest();
 	TraitRequest traitRequest();
+	TaxonomyRequest taxonomyRequest();
 }

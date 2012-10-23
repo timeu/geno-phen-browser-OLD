@@ -13,6 +13,7 @@ import com.gmi.nordborglab.browser.server.domain.BreadcrumbItem;
 import com.gmi.nordborglab.browser.server.domain.cdv.Study;
 import com.gmi.nordborglab.browser.server.domain.cdv.StudyProtocol;
 import com.gmi.nordborglab.browser.server.domain.genotype.AlleleAssay;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Taxonomy;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
@@ -22,6 +23,7 @@ import com.gmi.nordborglab.browser.server.repository.ExperimentRepository;
 import com.gmi.nordborglab.browser.server.repository.StatisticTypeRepository;
 import com.gmi.nordborglab.browser.server.repository.StudyProtocolRepository;
 import com.gmi.nordborglab.browser.server.repository.StudyRepository;
+import com.gmi.nordborglab.browser.server.repository.TaxonomyRepository;
 import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
 import com.gmi.nordborglab.browser.server.repository.UnitOfMeasureRepository;
 import com.gmi.nordborglab.browser.server.service.HelperService;
@@ -30,6 +32,7 @@ import com.gmi.nordborglab.browser.shared.proxy.StatisticTypeProxy;
 import com.gmi.nordborglab.browser.shared.proxy.UnitOfMeasureProxy;
 import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
 import com.gmi.nordborglab.browser.shared.service.HelperFactory;
+import com.google.common.collect.Iterables;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 import com.google.web.bindery.autobean.vm.AutoBeanFactorySource;
@@ -46,6 +49,9 @@ public class HelperServiceImpl implements HelperService {
 	
 	@Resource
 	private ExperimentRepository experimentRepository;
+	
+	@Resource
+	private TaxonomyRepository taxonomRepository;
 	
 	@Resource
 	private AlleleAssayRepository alleleAssayRepository;
@@ -81,8 +87,8 @@ public class HelperServiceImpl implements HelperService {
 		}
 		else if (object.equals("study")) {
 			Study study = studyRepository.findOne(id);
-			TraitUom trait = study.getTraits().get(0).getTraitUom();
-			Experiment exp = study.getTraits().get(0).getObsUnit().getExperiment();
+			TraitUom trait = Iterables.get(study.getTraits(),0).getTraitUom();
+			Experiment exp = Iterables.get(study.getTraits(),0).getObsUnit().getExperiment();
 			breadcrumbs.add(new BreadcrumbItem(exp.getId(),exp.getName(),"experiment"));
 		    breadcrumbs.add(new BreadcrumbItem(trait.getId(),trait.getLocalTraitName(),"phenotype"));
 		    breadcrumbs.add(new BreadcrumbItem(study.getId(),study.getName(),"study"));
@@ -93,6 +99,10 @@ public class HelperServiceImpl implements HelperService {
 			breadcrumbs.add(new BreadcrumbItem(exp.getId(),exp.getName(),"experiment"));
 		    breadcrumbs.add(new BreadcrumbItem(trait.getId(),trait.getLocalTraitName(),"phenotype"));
 		    breadcrumbs.add(new BreadcrumbItem(trait.getId(),"New Study","studywizard"));
+		}
+		else if (object.equals("taxonomy")) {
+			Taxonomy tax = taxonomRepository.findOne(id);
+			breadcrumbs.add(new BreadcrumbItem(tax.getId(),tax.getGenus()+" "+tax.getSpecies(),"taxonomy"));
 		}
 		return breadcrumbs;
 	}

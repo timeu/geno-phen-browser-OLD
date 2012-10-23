@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -28,6 +30,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.gmi.nordborglab.browser.server.domain.cdv.Study;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.pages.StudyPage;
+import com.gmi.nordborglab.browser.server.domain.phenotype.Trait;
+import com.gmi.nordborglab.browser.server.repository.StudyRepository;
+import com.gmi.nordborglab.browser.server.repository.TraitRepository;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 import com.gmi.nordborglab.browser.server.testutils.SecurityUtils;
 import com.google.common.collect.ImmutableList;
@@ -36,7 +41,12 @@ public class CdvServiceTest extends BaseTest {
 
 	@Resource
 	private CdvService service;
+	
+	@Resource
+	private TraitRepository traitRepository;
 
+	@Resource
+	private StudyRepository studyRepository;
 
 	@Resource
 	private MutableAclService aclService;
@@ -80,6 +90,32 @@ public class CdvServiceTest extends BaseTest {
 	    Study study = service.findStudy(1L);
 		assertTrue(study.isOwner());
 	}
+	
+	@Test
+	public void testSaveStudy() {
+		Collection<? extends GrantedAuthority> adminAuthorities = ImmutableList.of(new SimpleGrantedAuthority("ROLE_ADMIN")).asList();
+	    SecurityUtils.makeActiveUser("TEST", "TEST",adminAuthorities);
+	    Study study = new Study();
+	    study.setName("test");
+	    Set<Trait> traits = new HashSet<Trait>();
+	    Trait trait = traitRepository.findOne(1L);
+	    traits.add(trait);
+	    study.setTraits(traits);
+		study = service.saveStudy(study);
+		assertNotNull(study);
+		assertEquals("test", study.getName());
+		assertNotNull(study.getTraits());
+		assertEquals(1L, study.getTraits().size());
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void testSaveStudyExceptionWhenNoPhenotype() {
+		Collection<? extends GrantedAuthority> adminAuthorities = ImmutableList.of(new SimpleGrantedAuthority("ROLE_ADMIN")).asList();
+	    SecurityUtils.makeActiveUser("TEST", "TEST",adminAuthorities);
+	    Study study = new Study();
+	    study.setName("test");
+		study = service.saveStudy(study);
+	}
 
 	@Test(expected=AccessDeniedException.class)
 	public void testFindStudiesByPhenotypeIdAccessedDenied() {
@@ -99,5 +135,14 @@ public class CdvServiceTest extends BaseTest {
 		aclService.updateAcl(acl);
 		SecurityUtils.setAnonymousUser();
 		service.findStudiesByPhenotypeId(1L, 0, 50);
+	}
+	
+	@Test(expected=AccessDeniedException.class)
+	public void testSaveStudyAccessDenied() {
+		Collection<? extends GrantedAuthority> adminAuthorities = ImmutableList.of(new SimpleGrantedAuthority("ROLE_ADMIN")).asList();
+	    SecurityUtils.makeActiveUser("TEST", "TEST",adminAuthorities);
+	    Study study = studyRepository.findOne(1L);
+		SecurityUtils.setAnonymousUser();
+		service.saveStudy(study);
 	}
 }

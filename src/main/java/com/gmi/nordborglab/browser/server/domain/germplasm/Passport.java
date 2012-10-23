@@ -40,11 +40,13 @@ public class Passport extends BaseEntity{
     @OneToMany(mappedBy="passport",cascade={CascadeType.PERSIST,CascadeType.MERGE})
 	private Set<Allele> alleles = new HashSet<Allele>();
     
+    @ManyToOne()
+    @JoinColumn(name="div_sampstat_id")
+    private Sampstat sampstat;
     
     private String accename;
     private String source;
     private String accenumb;
-    private String sampstat;
     private String comments;
     
     public Passport() {
@@ -91,11 +93,11 @@ public class Passport extends BaseEntity{
 		this.accenumb = acceNumb;
 	}
 
-	public String getSampstat() {
+	public Sampstat getSampstat() {
 		return sampstat;
 	}
 
-	public void setSampstat(String sampstat) {
+	public void setSampstat(Sampstat sampstat) {
 		this.sampstat = sampstat;
 	}
 

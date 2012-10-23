@@ -97,7 +97,7 @@
 			.footer_items {
 				float: left;
 				line-height: 3.423em;
-				padding-right: 10px;
+				margin-right: 10px;
 				color: #999;
 			}
 			
@@ -227,14 +227,15 @@
 					</li>
 					<li>
 						<g:InlineHyperlink ui:field="germplasmLink"
-							targetHistoryToken="{nameTokens.getHome}">Germplasm</g:InlineHyperlink>
+							targetHistoryToken="{nameTokens.getTaxonomies}">Germplasm</g:InlineHyperlink>
 					</li>
 					<li>
 						<g:InlineHyperlink ui:field="genotypeLink"
 							targetHistoryToken="{nameTokens.getHome}">Genotype</g:InlineHyperlink>
 					</li>
 					<li class="{style.userItem}">
-						<a ui:field="userLink" href="login">Log In</a>
+						<g:Anchor ui:field="userLink">Login</g:Anchor>
+						<!-- <a ui:field="userLink" href="login">Log In</a> -->
 						<g:HTMLPanel ui:field="userInfoContainer"
 							addStyleNames="{style.userInfoPopup}">
 							<ul class="{style.userDetailLinks}">

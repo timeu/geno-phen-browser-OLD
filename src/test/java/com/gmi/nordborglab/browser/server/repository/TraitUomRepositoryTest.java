@@ -3,13 +3,16 @@ package com.gmi.nordborglab.browser.server.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.junit.Test;
 
+import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.domain.phenotype.UnitOfMeasure;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
@@ -66,7 +69,7 @@ public class TraitUomRepositoryTest extends BaseTest {
 	@Test
 	public void testCountStudiesByPhenotypeId() {
 		Long count = repository.countStudiesByPhenotypeId(1L);
-		assertEquals(new Long(1), count);
+		assertEquals(new Long(2), count);
 	}
 	
 	@Test
@@ -74,6 +77,19 @@ public class TraitUomRepositoryTest extends BaseTest {
 		TraitUom trait = repository.findByStudyId(1L);
 		assertNotNull("trait not found",trait);
 		assertEquals("id of trait is wrong",1L, trait.getId().longValue());
+	}
+	
+	@Test
+	public void testCountTraitsForStatisticType() {
+		List<Object[]> statisticTypes = repository.countTraitsForStatisticType(1L);
+		assertNotNull("staticTypes map not found",statisticTypes);
+		assertEquals("no statiticTypes found",2,statisticTypes.size());
+		Object[] statisticType = statisticTypes.get(0);
+		assertEquals("wrong number of elements", 2,statisticType.length);
+		assertTrue("wrong key",statisticType[0] instanceof StatisticType);
+		assertTrue("wrong value",statisticType[1] instanceof Long);
+		assertEquals("wrong number of traits", 167L,statisticType[1]);
+		
 	}
 	
 	public static TraitUom createTraitUomWithAllDependencies() {
@@ -93,6 +109,6 @@ public class TraitUomRepositoryTest extends BaseTest {
 		assertEquals("unit type for UnitOfMeasure incorrect", "test",actual.getUnitOfMeasure().getUnitType());
 	}
 	
-	
+
 	
 }

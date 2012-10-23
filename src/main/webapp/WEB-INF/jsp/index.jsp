@@ -4,22 +4,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
-
-<!doctype html>
-
+<!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <link type="text/css" rel="stylesheet" href="?.css">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Browser</title>
+    <link rel="stylesheet" href="<c:url value='/css/m-styles.min.css'/>" /> 
      <script type="text/javascript">
-        //google.load("visualization", "1", {'packages' : ["corechart","motionchart","geomap"] });
     <sec:authorize access="isAuthenticated()">
        	var userData={'user':'<sec:authentication htmlEscape="false" property="principal.json"/>'};
    	</sec:authorize>
    	    var appData={'data':'${appData}'}
     </script>
     <script type="text/javascript" src="<c:url value='/browser/browser.nocache.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/js/m-radio.min.js' />"></script>
   </head>
 
   <body>

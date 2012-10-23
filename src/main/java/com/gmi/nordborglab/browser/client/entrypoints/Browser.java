@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import com.gmi.nordborglab.browser.client.CurrentUser;
 import com.gmi.nordborglab.browser.client.gin.ClientGinjector;
 import com.gmi.nordborglab.browser.client.resources.MainResources;
-import com.gmi.nordborglab.browser.shared.proxy.AppDataProxy;
 import com.gmi.nordborglab.browser.shared.proxy.AppUserProxy;
 import com.gmi.nordborglab.browser.shared.service.AppUserFactory;
 import com.gmi.nordborglab.browser.shared.service.HelperFactory;

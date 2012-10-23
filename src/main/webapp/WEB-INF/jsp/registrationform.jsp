@@ -9,6 +9,7 @@
 		<title>Registration</title>
 		<link rel="stylesheet" href="<c:url value='/css/login.css'/>" />
 		<link rel="stylesheet" href="<c:url value='/css/960_12_col.css'/>" />
+		<link rel="stylesheet" href="<c:url value='/css/m-styles.min.css'/>" /> 
 		<style>
 			.form-item { margin: 20px 0; }
 			.form-label { font-weight: bold; }
@@ -16,6 +17,7 @@
 			.form-error-message { color: #900; }
 			.form-error-field { background-color: #FFC; }
 		</style>
+		<script type="text/javascript" src="<c:url value='/js/m-radio.min.js' />"></script>
 		<script type="text/javascript">
 			window.onload = function() {
 				document.getElementById("firstName").focus();

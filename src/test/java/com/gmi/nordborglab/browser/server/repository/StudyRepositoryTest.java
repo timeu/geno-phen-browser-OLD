@@ -15,6 +15,7 @@ import com.gmi.nordborglab.browser.server.domain.cdv.StudyProtocol;
 import com.gmi.nordborglab.browser.server.domain.genotype.AlleleAssay;
 import com.gmi.nordborglab.browser.server.domain.phenotype.Trait;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
+import com.google.common.collect.Iterables;
 
 public class StudyRepositoryTest extends BaseTest{
 
@@ -58,7 +59,7 @@ public class StudyRepositoryTest extends BaseTest{
 		assertEquals(1, page.getContent().size());
 		assertEquals(1,page.getTotalElements());
 		Study study = page.getContent().get(0);
-		assertEquals(new Long(1L),study.getTraits().get(0).getTraitUom().getId());
+		assertEquals(new Long(1L),Iterables.get(study.getTraits(),0).getTraitUom().getId());
 	}
 	
 	@Test
@@ -84,7 +85,7 @@ public class StudyRepositoryTest extends BaseTest{
 		assertEquals("wrong analysis method for Protocol", "test",actual.getProtocol().getAnalysisMethod());
 		assertNotNull("traits not set", actual.getTraits());
 		assertEquals("correct trait count", 1,actual.getTraits().size());
-		assertEquals("correct trait value", "test",actual.getTraits().get(0).getValue());
+		assertEquals("correct trait value", "test",Iterables.get(actual.getTraits(),0).getValue());
 	}
 }
 

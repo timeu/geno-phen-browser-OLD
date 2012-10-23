@@ -1,6 +1,11 @@
 package com.gmi.nordborglab.browser.server.service.impl;
 
+import java.security.BasicPermission;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -11,6 +16,7 @@ import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
@@ -19,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.pages.TraitUomPage;
+import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.repository.ExperimentRepository;
 import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
@@ -31,6 +38,7 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 @Service
 @Transactional(readOnly = true)
@@ -103,6 +111,14 @@ public class TraitUomServiceImpl implements TraitUomService {
 	@Override
 	public TraitUom findPhenotype(Long id) {
 		TraitUom traitUom = traitUomRepository.findOne(id);
+		Set<StatisticType> statisticTypeToReturn = new HashSet<StatisticType>();
+		List<Object[]> statisticTypes = traitUomRepository.countTraitsForStatisticType(id);
+		for (Object[] statisticTypeWithCount:  statisticTypes) {
+			StatisticType type = (StatisticType) statisticTypeWithCount[0];
+			type.setNumberOfTraits((Long)statisticTypeWithCount[1]);
+			statisticTypeToReturn.add(type);
+		}
+		traitUom.setStatisticTypes(statisticTypeToReturn);
 		traitUom = setPermissionAndOwner(traitUom);
 		return traitUom;
 	}
@@ -125,22 +141,44 @@ public class TraitUomServiceImpl implements TraitUomService {
 
 	private TraitUom setPermissionAndOwner(TraitUom traitUom) {
 		List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
-		ObjectIdentity oid = new ObjectIdentityImpl(Experiment.class,
+		ObjectIdentity oid = new ObjectIdentityImpl(TraitUom.class,
 				traitUom.getId());
-		Acl acl = aclService.readAclById(oid, authorities);
 		boolean isOwner = false;
-		for (Sid sid : authorities) {
-			if (sid.equals(acl.getOwner())) {
-				isOwner = true;
-				break;
-			}
+		Acl acl  = null;
+		try {
+			acl = aclService.readAclById(oid, authorities);
 		}
-		for (AccessControlEntry ace: acl.getEntries()) {
-			if (authorities.contains(ace.getSid())) {
-				traitUom.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
-				break;
-			}
+		catch (NotFoundException e) {
+			
 		}
+        if (acl != null) {
+			for (Sid sid : authorities) {
+				if (sid.equals(acl.getOwner())) {
+					isOwner = true;
+					break;
+				}
+			}
+			boolean foundAce = false;
+			for (AccessControlEntry ace: acl.getEntries()) {
+				if (authorities.contains(ace.getSid())) {
+					traitUom.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
+					foundAce = true;
+					break;
+				}
+			}
+			if (!foundAce && acl.getParentAcl() != null) {
+				for (AccessControlEntry ace: acl.getParentAcl().getEntries()) {
+					if (authorities.contains(ace.getSid())) {
+						traitUom.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
+						foundAce = true;
+						break;
+					}
+				}
+			}
+			
+			
+			
+        }
 		traitUom.setIsOwner(isOwner);
 		traitUom.setNumberOfObsUnits(traitUomRepository.countObsUnitsByPhenotypeId(traitUom.getId()));
 		traitUom.setNumberOfStudies(traitUomRepository.countStudiesByPhenotypeId(traitUom.getId()));

@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.gmi.nordborglab.browser.server.domain.BaseEntity;
 
@@ -16,6 +17,17 @@ public class StatisticType extends BaseEntity {
 	
 	private String stat_type;
 	
+	@Transient
+	private Long numberOfTraits;
+	
+	public Long getNumberOfTraits() {
+		return numberOfTraits;
+	}
+
+	public void setNumberOfTraits(Long numberOfTraits) {
+		this.numberOfTraits = numberOfTraits;
+	}
+
 	public void setStatType(String statType) {
 		this.stat_type = statType;
 	}

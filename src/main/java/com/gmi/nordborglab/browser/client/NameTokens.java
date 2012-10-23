@@ -2,17 +2,21 @@ package com.gmi.nordborglab.browser.client;
 
 public class NameTokens {
 
-	public static final String home = "home";
-	public static final String experiments = "experiments";
-	public static final String experiment = "experiment/{id}/overview";
-	public static final String phenotypes = "experiment/{id}/phenotypes";
-	public static final String phenotype = "phenotype/{id}/overview";
-	public static final String obsunit = "phenotype/{id}/obsunits";
-	public static final String studylist = "phenotype/{id}/studylist";
-	public static final String study = "study/{id}/overview";
-	public static final String studygwas = "study/{id}/studygwas";
-	public static final String experimentPermission = "experiment/{id}/permission";
-	public static final String studywizard = "phenotype/{id}/studywizard";
+	public static final String home = "!home";
+	public static final String experiments = "!experiments";
+	public static final String experiment = "!experiment/{id}/overview";
+	public static final String phenotypes = "!experiment/{id}/phenotypes";
+	public static final String phenotype = "!phenotype/{id}/overview";
+	public static final String obsunit = "!phenotype/{id}/obsunits";
+	public static final String studylist = "!phenotype/{id}/studylist";
+	public static final String study = "!study/{id}/overview";
+	public static final String studygwas = "!study/{id}/studygwas";
+	public static final String experimentPermission = "!experiment/{id}/permission";
+	public static final String studywizard = "!phenotype/{id}/studywizard";
+	public static final String taxonomies = "!taxonomies";
+	public static final String taxonomy = "!taxonomy/{id}/overview";
+	public static final String passports = "!taxonomy/{id}/passports";
+	public static final String passport = "!passport";
 
 	public static String getHome() {
 		return home;
@@ -56,6 +60,22 @@ public class NameTokens {
 
 	public static String getStudywizard() {
 		return studywizard;
+	}
+
+	public static String getTaxonomies() {
+		return taxonomies;
+	}
+
+	public static String getTaxonomy() {
+		return taxonomy;
+	}
+
+	public static String getPassports() {
+		return passports;
+	}
+
+	public static String getPassport() {
+		return passport;
 	}
 	
 	

@@ -14,5 +14,6 @@ public interface StatisticTypeProxy extends EntityProxy {
 	public String getStatType();
 	public void setStatType(String statType);
 
+	public Long getNumberOfTraits();
 	
 }

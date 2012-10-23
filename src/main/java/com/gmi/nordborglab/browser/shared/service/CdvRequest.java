@@ -13,4 +13,6 @@ public interface CdvRequest extends RequestContext {
 	Request<StudyPageProxy> findStudiesByPhenotypeId(Long id,int start,int size);
 
 	Request<StudyProxy> findStudy(Long id);
+	
+	Request<StudyProxy> saveStudy(StudyProxy study);
 }

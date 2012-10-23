@@ -5,6 +5,7 @@
 	xmlns:ed='urn:import:com.gmi.nordborglab.browser.client.editors'
 	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:gviz="urn:import:com.google.gwt.visualization.client.visualizations.corechart"
+	xmlns:chzn="urn:import:com.watopi.chosen.client.gwt"
 	ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
 	ui:generateKeys='com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator'
 	ui:generateLocales='default'>
@@ -93,8 +94,13 @@
 				</g:layer>
 				<g:layer top="5em" height="15em" left="10px" width="600px">
 					<g:HTMLPanel>
-					<div>Filter:</div><g:ValueListBox ui:field="statisticTypeListBox" />
-					<div><div></div><div><g:TextBox ui:field="searchNameTb" /></div></div>
+					<div >Filter:<g:ValueListBox ui:field="statisticTypeListBox" />
+						<g:HTMLPanel ui:field="countryFilterContainer">
+					   		<!--  <chzn:ChosenListBox ui:field="countryFilterLb" placeholderText="Filter countries..." />-->
+						</g:HTMLPanel>
+					<g:TextBox ui:field="searchNameTb" />
+					</div>
+					
 					</g:HTMLPanel>
 				</g:layer>
 				<g:layer top="15em" bottom="2.5em" left="10px" width="600px">
@@ -119,11 +125,6 @@
 					</g:LayoutPanel>
 				</g:layer>
 			</g:LayoutPanel>
-		</gui:page>
-		<gui:page title="Genotype">
-			<g:HTMLPanel addStyleNames="{style.title}">
-				<h1>3. Finish</h1>
-			</g:HTMLPanel>
 		</gui:page>
 	</gui:WizardPanel>
 </ui:UiBinder>

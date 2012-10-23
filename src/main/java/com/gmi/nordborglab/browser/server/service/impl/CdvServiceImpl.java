@@ -28,6 +28,7 @@ import com.gmi.nordborglab.browser.server.security.CustomAccessControlEntry;
 import com.gmi.nordborglab.browser.server.security.SecurityUtil;
 import com.gmi.nordborglab.browser.server.service.CdvService;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 @Service
 @Transactional(readOnly = true)
@@ -73,7 +74,7 @@ public class CdvServiceImpl implements CdvService {
 	public Study findStudy(Long id) {
 		Study study = studyRepository.findOne(id);
 		///TODO add ACL to Study derived from Trait 
-		TraitUom trait = study.getTraits().get(0).getTraitUom(); 
+		TraitUom trait = Iterables.get(study.getTraits(), 0).getTraitUom();
 		final List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
 		final ImmutableList<Permission> permissions = ImmutableList
 				.of(BasePermission.READ);
@@ -102,6 +103,45 @@ public class CdvServiceImpl implements CdvService {
 		study.setIsOwner(isOwner);
 		if (ace != null)
 			study.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
+		return study;
+	}
+
+
+	@Override
+	@Transactional(readOnly = false)
+	public Study saveStudy(Study study) {
+		if (study.getTraits().size() == 0)
+			throw new RuntimeException("Study must have phenotypes assigned");
+		TraitUom trait = Iterables.get(study.getTraits(), 0).getTraitUom();
+		final List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
+		final ImmutableList<Permission> permissions = ImmutableList
+				.of(BasePermission.WRITE);
+		ObjectIdentity oid = new ObjectIdentityImpl(TraitUom.class,trait.getId());
+		Acl acl = aclService.readAclById(oid, authorities);
+		try {
+			if (!acl.isGranted(permissions, authorities, false)) 
+				throw new AccessDeniedException("not allowed");
+		}
+		catch (NotFoundException e) {
+			throw new AccessDeniedException("not allowed");
+		}
+		boolean isOwner = false;
+		for (Sid sid : authorities) {
+			if (sid.equals(acl.getOwner())) {
+				isOwner = true;
+				break;
+			}
+		}
+		AccessControlEntry ace = null;
+		if (acl.getEntries().size() > 0)
+			 ace = acl.getEntries().get(0);
+		else if (acl.getParentAcl().getEntries().size() > 0)
+			ace = acl.getParentAcl().getEntries().get(0);
+			
+		study.setIsOwner(isOwner);
+		if (ace != null)
+			study.setUserPermission(new CustomAccessControlEntry((Long)ace.getId(),ace.getPermission().getMask(),ace.isGranting()));
+		study = studyRepository.save(study);
 		return study;
 	}
 

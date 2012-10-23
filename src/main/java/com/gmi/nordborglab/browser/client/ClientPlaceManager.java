@@ -4,6 +4,8 @@ package com.gmi.nordborglab.browser.client;
 import at.gmi.nordborglab.widgets.geochart.client.GeoChart;
 
 import com.gmi.nordborglab.browser.client.gin.DefaultPlace;
+import com.gmi.nordborglab.browser.client.util.ParallelRunnable;
+import com.gmi.nordborglab.browser.client.util.ParentCallback;
 import com.gmi.nordborglab.browser.shared.proxy.AppDataProxy;
 import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
 import com.google.gwt.visualization.client.VisualizationUtils;
@@ -37,26 +39,31 @@ public class ClientPlaceManager extends PlaceManagerImpl {
 
 	@Override
 	public void revealCurrentPlace() {
-		VisualizationUtils.loadVisualizationApi(new Runnable() {
+		
+		final ParallelRunnable visualizationRunnable = new ParallelRunnable();
+		final ParallelRunnable rfRunnalbe = new ParallelRunnable();
+		Receiver<AppDataProxy> receiver = new Receiver<AppDataProxy>() {
+
+			@Override
+			public void onSuccess(AppDataProxy response) {
+				currentUser.setAppData(response);
+				rfRunnalbe.run();
+			}
+		};
+		
+		ParentCallback parentCallback = new ParentCallback(visualizationRunnable,rfRunnalbe) {
 			
 			@Override
-			public void run() {
-				
+			protected void handleSuccess() {
+				ClientPlaceManager.super.revealCurrentPlace();
 			}
-		}, CoreChart.PACKAGE, MotionChart.PACKAGE,GeoChart.PACKAGE);
-		
+		};
+		VisualizationUtils.loadVisualizationApi(visualizationRunnable,CoreChart.PACKAGE, MotionChart.PACKAGE,GeoChart.PACKAGE);
 		if (currentUser.getAppData() == null) {
-			rf.helperRequest().getAppData().fire(new Receiver<AppDataProxy>() {
-
-				@Override
-				public void onSuccess(AppDataProxy response) {
-					currentUser.setAppData(response);
-					ClientPlaceManager.super.revealCurrentPlace();
-				}
-			});
+			rf.helperRequest().getAppData().fire(receiver);
 		}
 		else { 
-			ClientPlaceManager.super.revealCurrentPlace();
+			rfRunnalbe.run();
 		}
 	}
 }

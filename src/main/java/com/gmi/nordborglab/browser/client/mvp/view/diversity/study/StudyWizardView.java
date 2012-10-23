@@ -1,6 +1,7 @@
 package com.gmi.nordborglab.browser.client.mvp.view.diversity.study;
 
 import java.util.List;
+import java.util.Set;
 
 import at.gmi.nordborglab.widgets.geochart.client.GeoChart;
 
@@ -10,6 +11,8 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyWiz
 import com.gmi.nordborglab.browser.client.resources.DataGridResources;
 import com.gmi.nordborglab.browser.client.resources.FlagMap;
 import com.gmi.nordborglab.browser.client.ui.FlagCell;
+import com.gmi.nordborglab.browser.client.ui.HighlightCell;
+import com.gmi.nordborglab.browser.client.ui.HighlightCell.SearchTerm;
 import com.gmi.nordborglab.browser.client.ui.ResizeableColumnChart;
 import com.gmi.nordborglab.browser.client.ui.WizardPanel;
 import com.gmi.nordborglab.browser.shared.proxy.AlleleAssayProxy;
@@ -60,6 +63,9 @@ import com.google.web.bindery.requestfactory.gwt.client.RequestFactoryEditorDriv
 import com.google.web.bindery.requestfactory.gwt.ui.client.EntityProxyKeyProvider;
 import com.google.web.bindery.requestfactory.gwt.ui.client.ProxyRenderer;
 import com.gwtplatform.mvp.client.ViewWithUiHandlers;
+import com.watopi.chosen.client.event.ChosenChangeEvent;
+import com.watopi.chosen.client.event.ChosenChangeEvent.ChosenChangeHandler;
+import com.watopi.chosen.client.gwt.ChosenListBox;
 
 public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		implements StudyWizardPresenter.MyView {
@@ -81,7 +87,6 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 			checked = !checked;
 		}
 	}
-	
 
 	private final Widget widget;
 
@@ -117,10 +122,18 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 	DataGrid<ObsUnitProxy> missingGenotypesGrid;
 	@UiField(provided = true)
 	DataGrid<TraitProxy> phenotypeDataGrid;
-	@UiField SimpleLayoutPanel phenotypeContainer;
-	@UiField SimpleLayoutPanel mapContainer;
-	@UiField(provided=true) ValueListBox<StatisticTypeProxy> statisticTypeListBox;
-	@UiField TextBox searchNameTb;
+	@UiField
+	SimpleLayoutPanel phenotypeContainer;
+	@UiField
+	SimpleLayoutPanel mapContainer;
+	@UiField(provided = true)
+	ValueListBox<StatisticTypeProxy> statisticTypeListBox;
+	@UiField
+	TextBox searchNameTb;
+	//@UiField(provided=true)
+	ChosenListBox countryFilterLb;
+	
+	@UiField HTMLPanel countryFilterContainer;
 
 	@UiField
 	MyStyle style;
@@ -130,6 +143,7 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 	@UiField(provided = true)
 	SimplePager phenotypeDataGridPager;
 
+	private SearchTerm searchNameTerm = new SearchTerm(); 
 	private PieChart dataAccessionPiechart;
 	private final StudyCreateDriver studyCreateDriver;
 	private HTMLPanel emptyDataGridWidget = new HTMLPanel(
@@ -163,19 +177,19 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		phenotypeDataGrid.setSelectionModel(null, DefaultSelectionEventManager
 				.<TraitProxy> createCheckboxManager());
 
-		statisticTypeListBox = new ValueListBox<StatisticTypeProxy>(new ProxyRenderer<StatisticTypeProxy>(null) {
+		statisticTypeListBox = new ValueListBox<StatisticTypeProxy>(
+				new ProxyRenderer<StatisticTypeProxy>(null) {
 
-			@Override
-			public String render(StatisticTypeProxy object) {
-				if (object != null)
-					return object.getStatType();
-				return null;
-			}
-		});
-		
+					@Override
+					public String render(StatisticTypeProxy object) {
+						if (object != null)
+							return object.getStatType();
+						return null;
+					}
+				});
+
 		widget = binder.createAndBindUi(this);
-		
-		
+
 		this.studyCreateDriver.initialize(studyCreateEditor);
 		emptyDataGridWidget.setStylePrimaryName(style.emptyDataGridWidget());
 		loadingIndicatorWidget.setStylePrimaryName(style.loadingIndicator());
@@ -221,22 +235,37 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 						getUiHandlers().onGenotypeChange(event.getValue());
 					}
 				});
-		
-		statisticTypeListBox.addValueChangeHandler(new ValueChangeHandler<StatisticTypeProxy>() {
 
-			@Override
-			public void onValueChange(ValueChangeEvent<StatisticTypeProxy> event) {
-				getUiHandlers().onStatisticTypeChanged(event.getValue());
-			}
-		});
+		statisticTypeListBox
+				.addValueChangeHandler(new ValueChangeHandler<StatisticTypeProxy>() {
+
+					@Override
+					public void onValueChange(
+							ValueChangeEvent<StatisticTypeProxy> event) {
+						getUiHandlers()
+								.onStatisticTypeChanged(event.getValue());
+					}
+				});
 		searchNameTb.addKeyUpHandler(new KeyUpHandler() {
-			
+
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				getUiHandlers().onSearchName(searchNameTb.getText());
 			}
 		});
-		
+		countryFilterContainer.clear();
+		countryFilterLb = new ChosenListBox(true);
+		countryFilterLb.setMaxSelectedOptions(5);
+		countryFilterLb.setWidth("200px");
+		countryFilterContainer.add(countryFilterLb);
+		countryFilterLb.setPlaceholderText("Select countries to filter...");
+		countryFilterLb.addChosenChangeHandler(new ChosenChangeHandler() {
+			
+			@Override
+			public void onChange(ChosenChangeEvent event) {
+				getUiHandlers().onFilterCountry(event.getValue(), event.isSelection());
+			}
+		});
 		initMissingGenotypesDataGrid(flagMap);
 		initPhenotypeDataGrid(flagMap);
 		mapContainer.add(geoChart);
@@ -255,10 +284,18 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 	@Override
 	public void setAcceptableValues(
 			List<StudyProtocolProxy> studyProtocolValues,
-			List<AlleleAssayProxy> alleleAssayValues, List<StatisticTypeProxy> statisticTypeValues) {
+			List<AlleleAssayProxy> alleleAssayValues,
+			List<StatisticTypeProxy> statisticTypeValues) {
 		studyCreateEditor.setAcceptableValues(studyProtocolValues,
 				alleleAssayValues);
-		statisticTypeListBox.setValue(statisticTypeValues.get(0),false); // Workaround for Bug for ValueListBox (fixed in 2.5)
+		statisticTypeListBox.setValue(statisticTypeValues.get(0), false); // Workaround
+																			// for
+																			// Bug
+																			// for
+																			// ValueListBox
+																			// (fixed
+																			// in
+																			// 2.5)
 		statisticTypeListBox.setAcceptableValues(statisticTypeValues);
 	}
 
@@ -319,7 +356,7 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 				createPieChartOptions(true));
 		piechartContainer.add(dataAccessionPiechart);
 	}
-	
+
 	@Override
 	public void showBlankColumnChart() {
 		DataTable data = DataTable.create();
@@ -334,7 +371,7 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		data.setValue(2, 1, 7);
 		drawHistogram(data, createColumnChartOptions(true));
 	}
-	
+
 	@Override
 	public void showBlankGeoChart() {
 		DataTable data = DataTable.create();
@@ -342,7 +379,7 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		data.addColumn(ColumnType.NUMBER, "Frequency");
 		drawGeoChart(data, createGeoChart(true));
 	}
-	
+
 	private GeoChart.Options createGeoChart(boolean isblank) {
 		GeoChart.Options options = GeoChart.Options.create();
 		if (isblank) {
@@ -351,17 +388,17 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		options.setWidth(mapContainer.getOffsetWidth());
 		return options;
 	}
-	
-	private Options  createColumnChartOptions(boolean isblank) {
-		Options options = Options .create();
+
+	private Options createColumnChartOptions(boolean isblank) {
+		Options options = Options.create();
 		if (isblank) {
 			options.setColors("#CCC");
 			Options toolTip = Options.create();
 			toolTip.set("trigger", "none");
-			options.set("tooltip",toolTip);
+			options.set("tooltip", toolTip);
 			Options legendOption = Options.create();
-			legendOption.set("position","none");
-			options.set("legend",legendOption);
+			legendOption.set("position", "none");
+			options.set("legend", legendOption);
 		}
 		options.setTitle("Phenotype Histogram");
 		Options animationOptions = Options.create();
@@ -370,31 +407,31 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		options.set("animation", animationOptions);
 		return options;
 	}
-	
-	private void drawHistogram(DataTable data,Options options) {
+
+	private void drawHistogram(DataTable data, Options options) {
 		if (phenotypeHistogramChart == null) {
 			phenotypeHistogramChart = new ResizeableColumnChart(data, options);
 			phenotypeContainer.add(phenotypeHistogramChart);
-		}
-		else
+		} else
 			phenotypeHistogramChart.draw2(data, options);
 	}
-	
-	private void drawGeoChart(DataTable data,GeoChart.Options  options) {
-		geoChart.draw(data,options);
+
+	private void drawGeoChart(DataTable data, GeoChart.Options options) {
+		geoChart.draw(data, options);
 	}
-	
+
 	@Override
-	public void showPhenotypeHistogramChart(ImmutableSortedMap<Double, Integer> data) {
+	public void showPhenotypeHistogramChart(
+			ImmutableSortedMap<Double, Integer> data) {
 		DataTable dataTable = DataTable.create();
 		dataTable.addColumn(ColumnType.STRING, "Bin");
 		dataTable.addColumn(ColumnType.NUMBER, "Frequency");
-		dataTable.addRows(data.size()-1);
+		dataTable.addRows(data.size() - 1);
 		ImmutableList<Double> keys = data.keySet().asList();
 		ImmutableList<Integer> values = data.values().asList();
-		for (int i=0;i<data.size()-1;i++) {
-			dataTable.setValue(i, 0,keys.get(i)+" - " + keys.get(i+1));
-			dataTable.setValue(i,1,values.get(i));
+		for (int i = 0; i < data.size() - 1; i++) {
+			dataTable.setValue(i, 0, keys.get(i) + " - " + keys.get(i + 1));
+			dataTable.setValue(i, 1, values.get(i));
 		}
 		drawHistogram(dataTable, createColumnChartOptions(false));
 	}
@@ -529,7 +566,7 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		phenotypeDataGrid.setColumnWidth(countryColumn, "150px");
 
 		Column<TraitProxy, String> nameColumn = new Column<TraitProxy, String>(
-				new TextCell()) {
+				new HighlightCell(searchNameTerm)) {
 			@Override
 			public String getValue(TraitProxy object) {
 				return object.getObsUnit().getName();
@@ -538,15 +575,15 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		phenotypeDataGrid.addColumn(nameColumn, "Name");
 		phenotypeDataGrid.setColumnWidth(nameColumn, "100%");
 
-		/*Column<TraitProxy, String> typeColumn = new Column<TraitProxy, String>(
-				new TextCell()) {
-			@Override
-			public String getValue(TraitProxy object) {
-				return object.getStatisticType().getStatType();
-			}
-		};
-		phenotypeDataGrid.addColumn(typeColumn, "Type");
-		phenotypeDataGrid.setColumnWidth(typeColumn, "50%");*/
+		/*
+		 * Column<TraitProxy, String> typeColumn = new Column<TraitProxy,
+		 * String>( new TextCell()) {
+		 * 
+		 * @Override public String getValue(TraitProxy object) { return
+		 * object.getStatisticType().getStatType(); } };
+		 * phenotypeDataGrid.addColumn(typeColumn, "Type");
+		 * phenotypeDataGrid.setColumnWidth(typeColumn, "50%");
+		 */
 
 		Column<TraitProxy, String> valueColumn = new Column<TraitProxy, String>(
 				new TextCell()) {
@@ -591,7 +628,7 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 		DataTable data = DataTable.create();
 		data.addColumn(ColumnType.STRING, "Country");
 		data.addColumn(ColumnType.NUMBER, "Frequency");
-		for (String cty: geochartData.elementSet()){
+		for (String cty : geochartData.elementSet()) {
 			int i = data.addRow();
 			data.setValue(i, 0, cty);
 			data.setValue(i, 1, geochartData.count(cty));
@@ -602,5 +639,31 @@ public class StudyWizardView extends ViewWithUiHandlers<StudyWizardUiHandlers>
 	@Override
 	public TakesValue<StatisticTypeProxy> getStatisticTypeListBox() {
 		return statisticTypeListBox;
+	}
+	
+	@Override
+	public SearchTerm getNameSearchTerm() {
+		return searchNameTerm;
+	}
+	
+	
+	@Override
+	public void setCountriesToFilter(Set<String> countries) {
+		initCountryFilter();
+		countryFilterLb.clear();
+		countryFilterLb.addItem("");
+		for (String country:countries) {
+			countryFilterLb.addItem(country);
+		}
+		countryFilterLb.update();
+		
+		// because of bug http://code.google.com/p/gwtquery/issues/detail?id=145
+		countryFilterLb.forceRedraw();
+	}
+	
+	private void initCountryFilter() {
+		if (countryFilterLb != null)
+			return;
+		
 	}
 }

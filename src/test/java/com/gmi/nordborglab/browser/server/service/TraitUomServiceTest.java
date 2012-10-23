@@ -27,6 +27,7 @@ import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
 import com.gmi.nordborglab.browser.server.repository.UserRepository;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
 import com.gmi.nordborglab.browser.server.testutils.SecurityUtils;
+import com.google.common.collect.Iterables;
 
 
 public class TraitUomServiceTest extends BaseTest {
@@ -80,8 +81,13 @@ public class TraitUomServiceTest extends BaseTest {
 		TraitUom phenotype = service.findPhenotype(1L);
 		assertNotNull("couldn't find phenotype", phenotype);
 		assertEquals("uncorrect number of obsUnits",new Long(167),phenotype.getNumberOfObsUnits());
-		assertEquals("uncorrect number of studies",new Long(1),phenotype.getNumberOfStudies());
+		assertEquals("uncorrect number of studies",new Long(2),phenotype.getNumberOfStudies());
+		assertNotNull("statisticTypes not loaded",phenotype.getStatisticTypes());
+		assertEquals("correct amount of statisticTypes",2,phenotype.getStatisticTypes().size());
+		assertEquals("wrong number of traits in statitictype",167,Iterables.get(phenotype.getStatisticTypes(), 0).getNumberOfTraits().intValue());
 	}
+	
+	
 	
 	
 	@Test

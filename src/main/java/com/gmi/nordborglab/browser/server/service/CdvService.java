@@ -9,4 +9,6 @@ public interface CdvService {
 	
 	public Study findStudy(Long id);
 	
+	public Study saveStudy(Study study);
+	
 }

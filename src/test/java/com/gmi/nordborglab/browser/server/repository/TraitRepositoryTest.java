@@ -5,12 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.junit.Test;
 
-import com.gmi.nordborglab.browser.server.domain.observation.ObsUnit;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.Trait;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
@@ -60,8 +60,15 @@ public class TraitRepositoryTest extends BaseTest{
 	}
 	
 	@Test
-	public void testFindAllTraitValuesByStatisticType() {
+	public void testFindAllTraitValuesByStatisticTypeAndAlleleAssay() {
 		List<Trait> traits = repository.findAllTraitValues(1L,1L,2L);
+		assertNotNull("nothing returned",traits);
+		assertEquals(167, traits.size());
+	}
+	
+	@Test
+	public void testFindAllTraitValuesByStatisticType() {
+		List<Trait> traits = repository.findByTraitUomIdAndStatisticTypeId(1L,2L);
 		assertNotNull("nothing returned",traits);
 		assertEquals(167, traits.size());
 	}

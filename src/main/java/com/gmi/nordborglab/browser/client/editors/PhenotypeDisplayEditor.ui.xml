@@ -22,17 +22,17 @@
 			margin-bottom: 0;
 			text-align: right;
 			vertical-align: top;
-			width: 180px;
+			width: 90px;
 			display:inline-block;
 		}
 
 		
 		.value {
 			padding: 0 0 0 13px;
-			width: 441px;
 			vertical-align: top;
 			line-height: 1.39em;
 			display:inline-block;
+			width:280px;
 		}
 	</ui:style>
 	<g:HTMLPanel>

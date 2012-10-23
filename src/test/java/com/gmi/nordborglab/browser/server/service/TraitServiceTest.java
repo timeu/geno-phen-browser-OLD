@@ -46,12 +46,22 @@ public class TraitServiceTest extends BaseTest {
 	}
 	
 	@Test
-	public void testFindAllPhenotypeValuesByStatisticType() {
+	public void testFindAllPhenotypeValuesByStatisticTypeAndAlleleAssay() {
 		SecurityUtils.setAnonymousUser();
 		List<Trait> traits = service.findAllTraitValues(1L, 1L,2L);
 		assertNotNull("nothin returned",traits);
 		assertEquals("Wrong number returned",167, traits.size());
 	}
+	
+	@Test
+	public void testFindAllPhenotypeValuesByStatisticType() {
+		SecurityUtils.setAnonymousUser();
+		List<Trait> traits = service.findAllTraitValuesByStatisticType(1L, 2L);
+		assertNotNull("nothin returned",traits);
+		assertEquals("Wrong number returned",167, traits.size());
+	}
+	
+	
 	
 	@Test(expected=AccessDeniedException.class)
 	public void testFindAllPhenotypeValuesByStatisticTypeAccessedDenied() {

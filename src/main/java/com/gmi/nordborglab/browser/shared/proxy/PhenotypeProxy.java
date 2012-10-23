@@ -1,5 +1,7 @@
 package com.gmi.nordborglab.browser.shared.proxy;
 
+import java.util.Set;
+
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.service.SpringEntitiyLocator;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
@@ -13,6 +15,10 @@ public interface PhenotypeProxy extends EntityProxy{
 	UnitOfMeasureProxy getUnitOfMeasure();
 	
 	void setUnitOfMeasure(UnitOfMeasureProxy unitOfMeasure);
+	
+	Set<TraitProxy> getTraits();
+	
+	Set<StatisticTypeProxy> getStatisticTypes();
 
 	String getLocalTraitName();
 	

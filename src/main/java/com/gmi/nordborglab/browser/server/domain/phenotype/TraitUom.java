@@ -50,6 +50,9 @@ public class TraitUom extends BaseEntity {
 	@Transient 
 	boolean isOwner = false;
 	
+	@Transient 
+	private Set<StatisticType> statisticTypes;
+	
 	public TraitUom() { }
 	
 	public AclTraitUomIdentity getAcl() {
@@ -58,6 +61,14 @@ public class TraitUom extends BaseEntity {
 	
 	public Set<Trait> getTraits() {
 		return traits;
+	}
+	
+	public Set<StatisticType> getStatisticTypes() {
+		return statisticTypes;
+	}
+	
+	public void setStatisticTypes(Set<StatisticType> statisticTypes) {
+		this.statisticTypes = statisticTypes;
 	}
 	
 	public UnitOfMeasure getUnitOfMeasure() {

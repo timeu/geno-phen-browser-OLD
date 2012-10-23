@@ -1,13 +1,8 @@
 package com.gmi.nordborglab.browser.client.mvp.presenter.diversity;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,29 +14,16 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.gmi.nordborglab.browser.client.NameTokens;
-import com.gmi.nordborglab.browser.client.manager.ExperimentManager;
-import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.DiversityPresenter;
-import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.experiments.ExperimentsOverviewPresenter;
 import com.gmi.nordborglab.browser.client.testutils.PresenterTestBase;
 import com.gmi.nordborglab.browser.client.testutils.PresenterTestModule;
 import com.gmi.nordborglab.browser.client.testutils.RequestFactoryHelper;
 import com.gmi.nordborglab.browser.server.domain.BreadcrumbItem;
-import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
-import com.gmi.nordborglab.browser.server.domain.pages.ExperimentPage;
-import com.gmi.nordborglab.browser.server.service.ExperimentService;
 import com.gmi.nordborglab.browser.server.service.HelperService;
 import com.gmi.nordborglab.browser.shared.proxy.BreadcrumbItemProxy;
-import com.gmi.nordborglab.browser.shared.proxy.ExperimentProxy;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 public class DiversityPresenterTest extends PresenterTestBase {

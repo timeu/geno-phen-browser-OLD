@@ -20,4 +20,6 @@ public interface StudyWizardUiHandlers extends UiHandlers {
 	public void onStatisticTypeChanged(StatisticTypeProxy type);
 
 	public void onSearchName(String text);
+	
+	public void onFilterCountry(String country,boolean selected);
 }

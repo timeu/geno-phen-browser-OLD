@@ -54,4 +54,10 @@ public class TraitServiceImpl implements TraitService {
 		return traitRepository.findAllTraitValues(phenotypeId, alleleAssayId,statisticTypeId);
 	}
 
+	@Override
+	public List<Trait> findAllTraitValuesByStatisticType(Long phenotypeId,
+			Long statiticTypeId) {
+		return traitRepository.findByTraitUomIdAndStatisticTypeId(phenotypeId,statiticTypeId);
+	}
+
 }

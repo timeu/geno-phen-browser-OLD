@@ -15,6 +15,11 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.phenotype.Stud
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyGWASPlotPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyTabPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.GermplasmPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportListPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyOverviewPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.home.HomePresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.home.dashboard.DashboardPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.main.MainPagePresenter;
@@ -60,4 +65,9 @@ public interface ClientGinjector extends Ginjector{
 	AppUserFactory getAppUserFactory();
 	AsyncProvider<StudyWizardPresenter> getStudyWizardPresenter();
 	HelperFactory getHelperFactory();
+	AsyncProvider<GermplasmPresenter> getGermplasmPresenter();
+	AsyncProvider<TaxonomyOverviewPresenter> getTaxonomyOverviewPresenter();
+	AsyncProvider<TaxonomyDetailPresenter> getTaxonomyDetailPresenter();
+	AsyncProvider<PassportListPresenter> getPasportListPresenter();
+	AsyncProvider<PassportDetailPresenter> getPassportDetailPresenter();
 }
