@@ -5,23 +5,29 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.junit.Test;
+import org.springframework.data.domain.Sort;
 
+import com.gmi.nordborglab.browser.server.domain.cdv.Study;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.domain.phenotype.UnitOfMeasure;
 import com.gmi.nordborglab.browser.server.testutils.BaseTest;
+import com.google.gwt.thirdparty.guava.common.collect.Iterables;
 
 
 public class TraitUomRepositoryTest extends BaseTest {
 	
 	@Resource
 	protected TraitUomRepository repository;
+	
+	@Resource
+	protected StudyRepository studyRepository;
 	
 	@Test
 	public void testFindById() {
@@ -110,5 +116,34 @@ public class TraitUomRepositoryTest extends BaseTest {
 	}
 	
 
+	@Test
+	public void testFindAllByPassportId() {
+		List<TraitUom> traits = repository.findAllByPasportId(1L, new Sort("id"));
+		assertEquals(254, traits.size());
+	}
 	
+	@Test
+	public void testFindAllByStudies() {
+		List<Study> studies = new ArrayList<Study>();
+		studies.add(studyRepository.findOne(1L));
+		List<TraitUom> traits = repository.findAllByStudies(studies);
+		assertNotNull("no traits found",traits);
+		assertEquals("wrong number of traits",1,traits.size());
+		assertEquals("wrong trait",1,Iterables.get(traits,0).getId().longValue());
+	}
+	
+	@Test
+	public void testFindAllByStudiesGrouped() {
+		List<Study> studies = new ArrayList<Study>();
+		studies.add(studyRepository.findOne(1L));
+		List<Object[]> traits = repository.findAllByStudiesGrouped(studies);
+		assertNotNull("no traits found",traits);
+		assertEquals("wrong number of elements",1,traits.size());
+		Object[] trait = traits.get(0);
+		assertEquals("wrong number of elements", 2,trait.length);
+		assertTrue("wrong key",trait[0] instanceof Study);
+		assertTrue("wrong value",trait[1] instanceof TraitUom);
+		assertEquals("wrong study", 1,((Study)trait[0]).getId().longValue());
+		assertEquals("wrong trait", 1,((TraitUom)trait[1]).getId().longValue());
+	}
 }

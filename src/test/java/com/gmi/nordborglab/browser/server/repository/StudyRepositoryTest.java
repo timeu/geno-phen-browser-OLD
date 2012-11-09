@@ -4,11 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.gmi.nordborglab.browser.server.domain.cdv.Study;
 import com.gmi.nordborglab.browser.server.domain.cdv.StudyProtocol;
@@ -56,8 +59,8 @@ public class StudyRepositoryTest extends BaseTest{
 		assertNotNull(page);
 		assertEquals(0,page.getNumber());
 		assertNotNull(page.getContent());
-		assertEquals(1, page.getContent().size());
-		assertEquals(1,page.getTotalElements());
+		assertEquals(2, page.getContent().size());
+		assertEquals(2,page.getTotalElements());
 		Study study = page.getContent().get(0);
 		assertEquals(new Long(1L),Iterables.get(study.getTraits(),0).getTraitUom().getId());
 	}
@@ -86,6 +89,15 @@ public class StudyRepositoryTest extends BaseTest{
 		assertNotNull("traits not set", actual.getTraits());
 		assertEquals("correct trait count", 1,actual.getTraits().size());
 		assertEquals("correct trait value", "test",Iterables.get(actual.getTraits(),0).getValue());
+	}
+	
+	@Test
+	public void testFindAllByPassportId() {
+		List<Study> studies = repository.findAllByPassportId(6964L, new Sort("id"));
+		assertNotNull("no studies returned",studies);
+		assertEquals("wrong number of studies",2,studies.size());
+		assertEquals("wrong study",1,studies.get(0).getId().longValue());
+		assertEquals("wrong study",850,studies.get(1).getId().longValue());
 	}
 }
 

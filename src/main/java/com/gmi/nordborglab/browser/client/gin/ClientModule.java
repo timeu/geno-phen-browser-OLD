@@ -36,6 +36,7 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyWiz
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.GermplasmPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportListPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.stock.StockDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyOverviewPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.home.HomePresenter;
@@ -87,6 +88,7 @@ import com.gmi.nordborglab.browser.client.mvp.view.germplasm.taxonomy.TaxonomyOv
 import com.gmi.nordborglab.browser.client.mvp.view.germplasm.taxonomy.TaxonomyDetailView;
 import com.gmi.nordborglab.browser.client.mvp.view.germplasm.passport.PassportListView;
 import com.gmi.nordborglab.browser.client.mvp.view.germplasm.passport.PassportDetailView;
+import com.gmi.nordborglab.browser.client.mvp.view.germplasm.stock.StockDetailView;
 
 public class ClientModule extends AbstractPresenterModule {
 
@@ -224,6 +226,10 @@ public class ClientModule extends AbstractPresenterModule {
 		bindPresenter(PassportDetailPresenter.class,
 				PassportDetailPresenter.MyView.class, PassportDetailView.class,
 				PassportDetailPresenter.MyProxy.class);
+
+		bindPresenter(StockDetailPresenter.class,
+				StockDetailPresenter.MyView.class, StockDetailView.class,
+				StockDetailPresenter.MyProxy.class);
 	}
 
 	@Provides

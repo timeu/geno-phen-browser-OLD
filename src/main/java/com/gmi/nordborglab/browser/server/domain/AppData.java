@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.gmi.nordborglab.browser.server.domain.cdv.StudyProtocol;
 import com.gmi.nordborglab.browser.server.domain.genotype.AlleleAssay;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Sampstat;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.UnitOfMeasure;
 
@@ -13,6 +14,7 @@ public class AppData {
 	protected List<StatisticType> statisticTypeList;
 	protected List<AlleleAssay> alleleAssayList;
 	protected List<StudyProtocol> studyProtocolList;
+	protected List<Sampstat> sampStatList;
 		
 	public AppData() {}
 
@@ -46,6 +48,14 @@ public class AppData {
 
 	public void setStudyProtocolList(List<StudyProtocol> studyProtocolList) {
 		this.studyProtocolList = studyProtocolList;
+	}
+
+	public List<Sampstat> getSampStatList() {
+		return sampStatList;
+	}
+
+	public void setSampStatList(List<Sampstat> sampStatList) {
+		this.sampStatList = sampStatList;
 	}
 	
 }

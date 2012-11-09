@@ -137,6 +137,13 @@ public class TraitUomServiceTest extends BaseTest {
 		service.save(phenotype);
 	}
 	
+	@Test
+	public void testFindPhenotypesByPassportId() {
+		SecurityUtils.setAnonymousUser();
+		List<TraitUom> traits = service.findPhenotypesByPassportId(1L);
+		assertEquals(254, traits.size());
+	}
+	
 	
 	private void createTestUser(String role) {
 		AppUser appUser = new AppUser("test@test.at");

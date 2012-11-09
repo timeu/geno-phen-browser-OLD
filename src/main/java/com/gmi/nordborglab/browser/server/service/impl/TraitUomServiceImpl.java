@@ -1,15 +1,13 @@
 package com.gmi.nordborglab.browser.server.service.impl;
 
-import java.security.BasicPermission;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -23,7 +21,6 @@ import org.springframework.security.acls.model.Sid;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.pages.TraitUomPage;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
@@ -38,11 +35,11 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 @Service
 @Transactional(readOnly = true)
 public class TraitUomServiceImpl implements TraitUomService {
+	
 	
 	@Resource
 	private TraitUomRepository traitUomRepository;
@@ -75,9 +72,14 @@ public class TraitUomServiceImpl implements TraitUomService {
 	}
 	
 	private FluentIterable<TraitUom> findPhenotypesByExperimentid(Long id) {
+		
+		return filterPhenotypesByAcl(traitUomRepository.findByExperimentId(id));
+	}
+	
+	private FluentIterable<TraitUom> filterPhenotypesByAcl(List<TraitUom> traitsToFilter) {
 		final List<Sid> authorities = SecurityUtil.getSids(roleHierarchy);
 		final ImmutableList<Permission> permissions = ImmutableList.of(BasePermission.READ);
-		FluentIterable<TraitUom> traits = FluentIterable.from(traitUomRepository.findByExperimentId(id));
+		FluentIterable<TraitUom> traits = FluentIterable.from(traitsToFilter);
 		if (traits.size() > 0) {
 			final ImmutableBiMap<TraitUom,ObjectIdentity> identities = SecurityUtil.retrieveObjectIdentites(traits.toImmutableList()).inverse();
 			final ImmutableMap<ObjectIdentity,Acl> acls = ImmutableMap.copyOf(aclService.readAclsById(identities.values().asList(), authorities));
@@ -100,6 +102,7 @@ public class TraitUomServiceImpl implements TraitUomService {
 		}
 		return traits;
 	}
+	
 
 	///TODO Custom query for better performance
 	@Override
@@ -183,6 +186,12 @@ public class TraitUomServiceImpl implements TraitUomService {
 		traitUom.setNumberOfObsUnits(traitUomRepository.countObsUnitsByPhenotypeId(traitUom.getId()));
 		traitUom.setNumberOfStudies(traitUomRepository.countStudiesByPhenotypeId(traitUom.getId()));
 		return traitUom;
+	}
+
+	@Override
+	public List<TraitUom> findPhenotypesByPassportId(Long passportId) {
+		Sort sort = new Sort("id");
+		return filterPhenotypesByAcl(traitUomRepository.findAllByPasportId(passportId,sort)).toImmutableList();
 	}
 }
 

@@ -1,5 +1,7 @@
 package com.gmi.nordborglab.browser.shared.service;
 
+import java.util.List;
+
 import com.gmi.nordborglab.browser.server.service.SpringServiceLocator;
 import com.gmi.nordborglab.browser.server.service.TraitUomService;
 import com.gmi.nordborglab.browser.shared.proxy.PhenotypePageProxy;
@@ -15,5 +17,7 @@ public interface PhenotypeRequest extends RequestContext{
 	Request<PhenotypeProxy> findPhenotype(Long id);
 
 	Request<PhenotypeProxy> save(PhenotypeProxy phenotype);
+	
+	Request<List<PhenotypeProxy>> findPhenotypesByPassportId(Long passportId);
 
 }

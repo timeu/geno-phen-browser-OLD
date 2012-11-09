@@ -1,12 +1,17 @@
 package com.gmi.nordborglab.browser.server.domain.observation;
 
+import java.util.Set;
+
 import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.gmi.nordborglab.browser.server.domain.BaseEntity;
+import com.gmi.nordborglab.browser.server.domain.germplasm.AccessionCollection;
 
 @Entity
 @Table(name="div_locality",schema="observation")
@@ -24,10 +29,16 @@ public class Locality  extends BaseEntity{
 	private String stateProvince;
 	private String loAccession;
 	
+	@OneToMany(mappedBy="locality",cascade={CascadeType.PERSIST,CascadeType.MERGE})
+	private Set<AccessionCollection> accessionCollections;
+	
 	public Locality() {
 		
 	}
 
+	public Set<AccessionCollection> getAccessionCollections() {
+		return accessionCollections;
+	}
 	public Integer getElevation() {
 		return elevation;
 	}

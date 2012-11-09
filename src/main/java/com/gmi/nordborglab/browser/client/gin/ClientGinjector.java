@@ -18,6 +18,7 @@ import com.gmi.nordborglab.browser.client.mvp.presenter.diversity.study.StudyTab
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.GermplasmPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportListPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.passport.PassportDetailPresenter;
+import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.stock.StockDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyDetailPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.germplasm.taxonomy.TaxonomyOverviewPresenter;
 import com.gmi.nordborglab.browser.client.mvp.presenter.home.HomePresenter;
@@ -70,4 +71,5 @@ public interface ClientGinjector extends Ginjector{
 	AsyncProvider<TaxonomyDetailPresenter> getTaxonomyDetailPresenter();
 	AsyncProvider<PassportListPresenter> getPasportListPresenter();
 	AsyncProvider<PassportDetailPresenter> getPassportDetailPresenter();
+	AsyncProvider<StockDetailPresenter> getStockDetailPresenter();
 }

@@ -1,7 +1,6 @@
 package com.gmi.nordborglab.browser.server.service;
 
 import java.util.List;
-import java.util.Set;
 
 import com.gmi.nordborglab.browser.server.domain.phenotype.Trait;
 

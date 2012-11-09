@@ -67,4 +67,11 @@ public class SpringEntitiyLocator extends Locator<BaseEntity,Long>{
 		}
 		return em;
 	}
+
+	@Override
+	public boolean isLive(BaseEntity domainObject) {
+		// TODO Auto-generated method stub
+		return super.isLive(domainObject);
+	}
+	
 }

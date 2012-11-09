@@ -12,4 +12,6 @@ public interface CustomRequestFactory extends RequestFactory{
 	PermissionRequest permissionRequest();
 	TraitRequest traitRequest();
 	TaxonomyRequest taxonomyRequest();
+	PassportRequest passportRequest();
+	StockRequest stockRequest();
 }

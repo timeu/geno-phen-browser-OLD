@@ -1,5 +1,7 @@
 package com.gmi.nordborglab.browser.shared.service;
 
+import java.util.List;
+
 import com.gmi.nordborglab.browser.server.service.CdvService;
 import com.gmi.nordborglab.browser.server.service.SpringServiceLocator;
 import com.gmi.nordborglab.browser.shared.proxy.StudyPageProxy;
@@ -15,4 +17,6 @@ public interface CdvRequest extends RequestContext {
 	Request<StudyProxy> findStudy(Long id);
 	
 	Request<StudyProxy> saveStudy(StudyProxy study);
+	
+	Request<List<StudyProxy>> findStudiesByPassportId(Long passportId);
 }

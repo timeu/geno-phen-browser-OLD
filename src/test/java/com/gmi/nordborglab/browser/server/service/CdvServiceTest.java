@@ -145,4 +145,14 @@ public class CdvServiceTest extends BaseTest {
 		SecurityUtils.setAnonymousUser();
 		service.saveStudy(study);
 	}
+	
+	@Test
+	public void testFindStudiesByPassportId() {
+		SecurityUtils.setAnonymousUser();
+		List<Study> studies = service.findStudiesByPassportId(6964L);
+		assertNotNull("no studies returned",studies);
+		assertEquals("wrong number of studies",2,studies.size());
+		assertEquals("wrong study",850,studies.get(0).getId().longValue());
+		assertEquals("wrong study",1,studies.get(1).getId().longValue());
+	}
 }

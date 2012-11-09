@@ -6,7 +6,6 @@ import com.gmi.nordborglab.browser.server.service.HelperService;
 import com.gmi.nordborglab.browser.server.service.SpringServiceLocator;
 import com.gmi.nordborglab.browser.shared.proxy.AppDataProxy;
 import com.gmi.nordborglab.browser.shared.proxy.BreadcrumbItemProxy;
-import com.gmi.nordborglab.browser.shared.proxy.UnitOfMeasureProxy;
 import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;

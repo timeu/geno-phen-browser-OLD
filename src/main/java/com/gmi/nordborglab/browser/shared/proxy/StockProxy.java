@@ -31,5 +31,7 @@ public interface StockProxy extends EntityProxy {
 	
 	public String getComments();
 	public void setComments(String comments);
+
+	public String getPedigreeData();
 	
 }

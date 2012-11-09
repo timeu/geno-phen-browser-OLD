@@ -15,10 +15,14 @@ import org.junit.Test;
 import com.gmi.nordborglab.browser.server.domain.AppData;
 import com.gmi.nordborglab.browser.server.domain.BreadcrumbItem;
 import com.gmi.nordborglab.browser.server.domain.cdv.Study;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Passport;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Stock;
 import com.gmi.nordborglab.browser.server.domain.germplasm.Taxonomy;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.repository.ExperimentRepository;
+import com.gmi.nordborglab.browser.server.repository.PassportRepository;
+import com.gmi.nordborglab.browser.server.repository.StockRepository;
 import com.gmi.nordborglab.browser.server.repository.StudyRepository;
 import com.gmi.nordborglab.browser.server.repository.TaxonomyRepository;
 import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
@@ -34,7 +38,13 @@ public class HelperServiceTest extends BaseTest {
 	private ExperimentRepository experimentRepository;
 	
 	@Resource
+	private StockRepository stockRepository;
+	
+	@Resource
 	private TaxonomyRepository taxonomyRepository;
+	
+	@Resource
+	private PassportRepository passportRepository;
 	
 	@Resource
 	private TraitUomRepository traitUomRepository;
@@ -145,7 +155,7 @@ public class HelperServiceTest extends BaseTest {
 	
 	
 	@Test
-	public void testTaxonomyWizardBreadcrumbs() {
+	public void testTaxonomyBreadcrumbs() {
 		Taxonomy taxonomy = taxonomyRepository.findOne(1L);
 		List<BreadcrumbItem> breadcrumbs = service.getBreadcrumbs(1L, "taxonomy");
 		
@@ -158,6 +168,44 @@ public class HelperServiceTest extends BaseTest {
 		assertEquals(taxonomy.getGenus()+" "+taxonomy.getSpecies() ,breadcrumbItem.getText());
 		assertEquals("taxonomy",breadcrumbItem.getType());
 	}
+	
+	@Test
+	public void testPassportsBreadcrumbs() {
+		Taxonomy taxonomy = taxonomyRepository.findOne(1L);
+		List<BreadcrumbItem> breadcrumbs = service.getBreadcrumbs(1L, "passports");
+		assertNotNull(breadcrumbs);
+		assertEquals(1, breadcrumbs.size());
+		BreadcrumbItem breadcrumbItem = breadcrumbs.get(0);
+		
+		assertEquals(taxonomy.getId(),breadcrumbItem.getId());
+		assertEquals(taxonomy.getGenus()+" "+taxonomy.getSpecies() ,breadcrumbItem.getText());
+		assertEquals("passports",breadcrumbItem.getType());
+	}
+	
+	@Test
+	public void testStockBreadcrumbs() {
+		Stock stock = stockRepository.findOne(1L);
+		Passport passport = stock.getPassport();
+		Taxonomy taxonomy = passport.getTaxonomy();
+		List<BreadcrumbItem> breadcrumbs = service.getBreadcrumbs(1L, "stock");
+		assertNotNull(breadcrumbs);
+		assertEquals(3, breadcrumbs.size());
+		BreadcrumbItem breadcrumbItem = breadcrumbs.get(0);
+		assertEquals(taxonomy.getId(),breadcrumbItem.getId());
+		assertEquals(taxonomy.getGenus()+" "+taxonomy.getSpecies() ,breadcrumbItem.getText());
+		assertEquals("taxonomy",breadcrumbItem.getType());
+		
+		breadcrumbItem = breadcrumbs.get(1);
+		assertEquals(passport.getId(),breadcrumbItem.getId());
+		assertEquals(passport.getAccename() ,breadcrumbItem.getText());
+		assertEquals("passport",breadcrumbItem.getType());
+		
+		breadcrumbItem = breadcrumbs.get(2);
+		assertEquals(stock.getId(),breadcrumbItem.getId());
+		assertEquals(stock.getId().toString() ,breadcrumbItem.getText());
+		assertEquals("stock",breadcrumbItem.getType());
+	}
+	
 	
 	@Test
 	public void testGetAppData() {
@@ -174,6 +222,9 @@ public class HelperServiceTest extends BaseTest {
 		
 		assertNotNull("Could not retrieve UnitOfMeasureList",data.getUnitOfMeasureList());
 		assertTrue("no elements found for UnitOfMeasureList",data.getUnitOfMeasureList().size()>0);
+		
+		assertNotNull("Could not retrieve Sampstats",data.getSampStatList());
+		assertTrue("no elements found for Sampstats",data.getSampStatList().size()>0);
 	}
 	 
 }

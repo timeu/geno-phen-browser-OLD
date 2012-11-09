@@ -7,7 +7,7 @@ import com.google.web.bindery.requestfactory.shared.ProxyFor;
 
 @ProxyFor(value=Sampstat.class, locator=SpringEntitiyLocator.class)
 public interface SampStatProxy extends EntityProxy {
-
+	public Long getId();
 	public String getSampstat();
 	public String getGermplasmType();
 }

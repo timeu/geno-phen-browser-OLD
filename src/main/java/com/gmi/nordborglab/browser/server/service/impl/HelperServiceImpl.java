@@ -13,6 +13,9 @@ import com.gmi.nordborglab.browser.server.domain.BreadcrumbItem;
 import com.gmi.nordborglab.browser.server.domain.cdv.Study;
 import com.gmi.nordborglab.browser.server.domain.cdv.StudyProtocol;
 import com.gmi.nordborglab.browser.server.domain.genotype.AlleleAssay;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Passport;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Sampstat;
+import com.gmi.nordborglab.browser.server.domain.germplasm.Stock;
 import com.gmi.nordborglab.browser.server.domain.germplasm.Taxonomy;
 import com.gmi.nordborglab.browser.server.domain.observation.Experiment;
 import com.gmi.nordborglab.browser.server.domain.phenotype.StatisticType;
@@ -20,26 +23,19 @@ import com.gmi.nordborglab.browser.server.domain.phenotype.TraitUom;
 import com.gmi.nordborglab.browser.server.domain.phenotype.UnitOfMeasure;
 import com.gmi.nordborglab.browser.server.repository.AlleleAssayRepository;
 import com.gmi.nordborglab.browser.server.repository.ExperimentRepository;
+import com.gmi.nordborglab.browser.server.repository.PassportRepository;
+import com.gmi.nordborglab.browser.server.repository.SampstatRepository;
 import com.gmi.nordborglab.browser.server.repository.StatisticTypeRepository;
+import com.gmi.nordborglab.browser.server.repository.StockRepository;
 import com.gmi.nordborglab.browser.server.repository.StudyProtocolRepository;
 import com.gmi.nordborglab.browser.server.repository.StudyRepository;
 import com.gmi.nordborglab.browser.server.repository.TaxonomyRepository;
 import com.gmi.nordborglab.browser.server.repository.TraitUomRepository;
 import com.gmi.nordborglab.browser.server.repository.UnitOfMeasureRepository;
 import com.gmi.nordborglab.browser.server.service.HelperService;
-import com.gmi.nordborglab.browser.shared.proxy.AppDataProxy;
-import com.gmi.nordborglab.browser.shared.proxy.StatisticTypeProxy;
-import com.gmi.nordborglab.browser.shared.proxy.UnitOfMeasureProxy;
-import com.gmi.nordborglab.browser.shared.service.CustomRequestFactory;
 import com.gmi.nordborglab.browser.shared.service.HelperFactory;
 import com.google.common.collect.Iterables;
-import com.google.web.bindery.autobean.shared.AutoBean;
-import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 import com.google.web.bindery.autobean.vm.AutoBeanFactorySource;
-import com.google.web.bindery.requestfactory.shared.DefaultProxyStore;
-import com.google.web.bindery.requestfactory.shared.ProxySerializer;
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
 
 @Service
 @Transactional(readOnly = true)
@@ -51,7 +47,16 @@ public class HelperServiceImpl implements HelperService {
 	private ExperimentRepository experimentRepository;
 	
 	@Resource
+	private StockRepository stockRepository;
+	
+	@Resource
 	private TaxonomyRepository taxonomRepository;
+	
+	@Resource
+	private PassportRepository passportRepository;
+	
+	@Resource
+	private SampstatRepository sampstatRepository;
 	
 	@Resource
 	private AlleleAssayRepository alleleAssayRepository;
@@ -100,9 +105,27 @@ public class HelperServiceImpl implements HelperService {
 		    breadcrumbs.add(new BreadcrumbItem(trait.getId(),trait.getLocalTraitName(),"phenotype"));
 		    breadcrumbs.add(new BreadcrumbItem(trait.getId(),"New Study","studywizard"));
 		}
-		else if (object.equals("taxonomy")) {
+		else if (object.equals("taxonomy") ) {
 			Taxonomy tax = taxonomRepository.findOne(id);
 			breadcrumbs.add(new BreadcrumbItem(tax.getId(),tax.getGenus()+" "+tax.getSpecies(),"taxonomy"));
+		}
+		else if (object.equals("passports")) {
+			Taxonomy tax = taxonomRepository.findOne(id);
+			breadcrumbs.add(new BreadcrumbItem(tax.getId(),tax.getGenus()+" "+tax.getSpecies(),"passports"));
+		}
+		else if (object.equals("passport")) {
+			Passport passport = passportRepository.findOne(id);
+			Taxonomy taxonomy = passport.getTaxonomy();
+			breadcrumbs.add(new BreadcrumbItem(taxonomy.getId(),taxonomy.getGenus()+" "+taxonomy.getSpecies(),"taxonomy"));
+			breadcrumbs.add(new BreadcrumbItem(passport.getId(),passport.getAccename(),"passport"));
+		}
+		else if (object.equals("stock")) {
+			Stock stock = stockRepository.findOne(id);
+			Passport passport  = stock.getPassport();
+			Taxonomy taxonomy = passport.getTaxonomy();
+			breadcrumbs.add(new BreadcrumbItem(taxonomy.getId(),taxonomy.getGenus()+" "+taxonomy.getSpecies(),"taxonomy"));
+			breadcrumbs.add(new BreadcrumbItem(passport.getId(),passport.getAccename(),"passport"));
+			breadcrumbs.add(new BreadcrumbItem(stock.getId(),stock.getId().toString(),"stock"));
 		}
 		return breadcrumbs;
 	}
@@ -150,11 +173,13 @@ public class HelperServiceImpl implements HelperService {
 		List<StatisticType> statisticTypeValues = statisticTypeRepository.findAll();
 		List<AlleleAssay> alleleAssayValues = alleleAssayRepository.findAll();
 		List<StudyProtocol> studyProtocolValues = studyProtocolRepository.findAll();
+		List<Sampstat> sampStatValues = sampstatRepository.findAll();
 		AppData appData = new AppData();
 		appData.setStatisticTypeList(statisticTypeValues);
 		appData.setUnitOfMeasureList(unitOfMeasureValues);
 		appData.setAlleleAssayList(alleleAssayValues);
 		appData.setStudyProtocolList(studyProtocolValues);
+		appData.setSampStatList(sampStatValues);
 		return appData;
 	}
 

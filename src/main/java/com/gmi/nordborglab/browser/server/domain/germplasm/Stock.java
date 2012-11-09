@@ -1,6 +1,8 @@
 package com.gmi.nordborglab.browser.server.domain.germplasm;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.AttributeOverride;
@@ -12,8 +14,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.gmi.nordborglab.browser.server.domain.BaseEntity;
+import com.gmi.nordborglab.browser.server.domain.observation.ObsUnit;
 
 
 @Entity
@@ -30,6 +34,8 @@ public class Stock extends BaseEntity{
 	@JoinColumn(name="div_passport_id")
 	private Passport passport;
 	
+	@OneToMany(mappedBy="stock",cascade={CascadeType.PERSIST,CascadeType.MERGE})
+    private List<ObsUnit> obsUnits = new ArrayList<ObsUnit>();
 	
 	@OneToMany(mappedBy="parent",cascade={CascadeType.PERSIST,CascadeType.MERGE})
     private Set<StockParent> parents = new HashSet<StockParent>();
@@ -37,9 +43,14 @@ public class Stock extends BaseEntity{
 	@OneToMany(mappedBy="child",cascade={CascadeType.PERSIST,CascadeType.MERGE})
     private Set<StockParent> childs = new HashSet<StockParent>();
 	
+	@Column(name="seed_lot")
 	private String seedLot;
+	@Column(name="stock_source")
 	private String stockSource;
 	private String comments;
+	
+	@Transient
+	private String pedigreeData;
 	
 	public Stock() {
 		
@@ -92,5 +103,21 @@ public class Stock extends BaseEntity{
 
 	public Set<StockParent> getChilds() {
 		return childs;
+	}
+
+	public List<ObsUnit> getObsUnits() {
+		return obsUnits;
+	}
+
+	public void setObsUnits(List<ObsUnit> obsUnits) {
+		this.obsUnits = obsUnits;
+	}
+
+	public String getPedigreeData() {
+		return pedigreeData;
+	}
+
+	public void setPedigreeData(String pedigreeData) {
+		this.pedigreeData = pedigreeData;
 	}
 }

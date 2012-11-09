@@ -94,6 +94,12 @@ public class GermplasmPresenter extends
 			if (alleleAssay != null) 
 				alleleAssayId = Long.parseLong(alleleAssay);
 		}
+		else if (request.matchesNameToken(NameTokens.passport) || request.matchesNameToken(NameTokens.stock)) {
+			if (alleleAssayId == null)
+				alleleAssayId = 0L;
+		}
+	
+		
 		if (taxonomies == null) {
 			fireEvent(new LoadingIndicatorEvent(true));
 			taxonomyManager.findAll(new Receiver<List<TaxonomyProxy>>() {
@@ -123,17 +129,17 @@ public class GermplasmPresenter extends
 		if (request.matchesNameToken(NameTokens.taxonomy)) {
 			type = "taxonomy";
 		}
-		else if (request.matchesNameToken(NameTokens.phenotype) || request.matchesNameToken(NameTokens.obsunit) || request.matchesNameToken(NameTokens.studylist)) {
-			title = "Phenotype";
-			type = "phenotype";
+		else if (request.matchesNameToken(NameTokens.passports) ) {
+			title = "Passports";
+			type = "passports";
 		}
-		else if(request.matchesNameToken(NameTokens.study)) {
-			title = "Study";
-			type ="study";
+		else if(request.matchesNameToken(NameTokens.passport)) {
+			title = "Passport";
+			type ="passport";
 		}
-		else if ( request.matchesNameToken(NameTokens.studywizard)) {
-			title = "Study";
-			type = "studywizard";
+		else if (request.matchesNameToken(NameTokens.stock)) {
+			title="Stock";
+			type = "stock";
 		}
 		getView().setTitle(title);
 		Long id = null;
@@ -156,6 +162,12 @@ public class GermplasmPresenter extends
 					String nameToken = null;
 					if (item.getType().equals("taxonomy"))
 						nameToken = NameTokens.taxonomy;
+					else if (item.getType().equals("passports"))
+						nameToken = NameTokens.passports;
+					else if (item.getType().equals("passport"))
+						nameToken = NameTokens.passport;
+					else if (item.getType().equals("stock"))
+						nameToken = NameTokens.stock;
 					PlaceRequest request = new ParameterizedPlaceRequest(nameToken).with("id", item.getId().toString());
 					getView().setBreadcrumbs(i+1,item.getText(),placeManager.buildHistoryToken(request));
 				}

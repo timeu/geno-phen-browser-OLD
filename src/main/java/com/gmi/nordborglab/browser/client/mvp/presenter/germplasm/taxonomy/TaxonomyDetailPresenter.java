@@ -155,13 +155,13 @@ public class TaxonomyDetailPresenter
 			public void onFailure(ServerFailure error) {
 				fireEvent(new LoadingIndicatorEvent(false));
 				getProxy().manualRevealFailed();
-				placeManager.revealPlace(new PlaceRequest(NameTokens.experiments));
+				placeManager.revealPlace(new PlaceRequest(NameTokens.taxonomies));
 			}
 		};
 		try {
 			Long taxonomyId = Long.valueOf(placeRequest.getParameter("id",
 					null));
-			if (taxonomy == null || !taxonomy.getId().equals(taxonomy)) {
+			if (taxonomy == null || !taxonomy.getId().equals(taxonomyId)) {
 				stats = null;
 				taxonomyManager.findOne(receiver, taxonomyId);
 			} else {

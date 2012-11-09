@@ -22,4 +22,7 @@ public interface AppDataProxy extends ValueProxy {
 	public List<AlleleAssayProxy> getAlleleAssayList();
 	public void setAlleleAssayList(List<AlleleAssayProxy> alleleAssayList);
 	
+	public List<SampStatProxy> getSampStatList();
+	public void setSampStatList(List<SampStatProxy> sampStatList);
+	
 }

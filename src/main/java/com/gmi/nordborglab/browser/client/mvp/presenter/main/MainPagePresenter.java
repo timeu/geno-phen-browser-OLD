@@ -1,8 +1,5 @@
 package com.gmi.nordborglab.browser.client.mvp.presenter.main;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.gmi.nordborglab.browser.client.CurrentUser;
 import com.gmi.nordborglab.browser.client.NameTokens;
 import com.gmi.nordborglab.browser.client.events.DisplayNotificationEvent;
@@ -11,8 +8,6 @@ import com.gmi.nordborglab.browser.shared.proxy.AppUserProxy;
 import com.gmi.nordborglab.browser.shared.service.AppUserFactory;
 import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.inject.Inject;
-import com.google.web.bindery.autobean.shared.AutoBean;
-import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
@@ -102,7 +97,10 @@ public class MainPagePresenter extends
 			)
 			menu = MENU.DIVERSITY;
 		else if (request.matchesNameToken(NameTokens.taxonomies) ||
-				request.matchesNameToken(NameTokens.taxonomy)
+				request.matchesNameToken(NameTokens.taxonomy) ||
+				request.matchesNameToken(NameTokens.passports) ||
+				request.matchesNameToken(NameTokens.passport) ||
+				request.matchesNameToken(NameTokens.stock)
 			)
 			menu = MENU.GERMPLASM;
 		return menu;

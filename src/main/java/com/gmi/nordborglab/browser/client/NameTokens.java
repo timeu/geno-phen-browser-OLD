@@ -16,7 +16,8 @@ public class NameTokens {
 	public static final String taxonomies = "!taxonomies";
 	public static final String taxonomy = "!taxonomy/{id}/overview";
 	public static final String passports = "!taxonomy/{id}/passports";
-	public static final String passport = "!passport";
+	public static final String passport = "!passport/{id}/overview";
+	public static final String stock = "!stock/{id}/overview";
 
 	public static String getHome() {
 		return home;
@@ -76,6 +77,10 @@ public class NameTokens {
 
 	public static String getPassport() {
 		return passport;
+	}
+
+	public static String getStock() {
+		return stock;
 	}
 	
 	
